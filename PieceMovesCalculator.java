@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class KingMovesCalculator {
-    public KingMovesCalculator(ChessPosition position ) {
+    HashSet<ChessMoves> moves = new HashSet<>();
 
+    public KingMovesCalculator(ChessPosition position ) {
+        ChessMoves moves [][] = new ChessMoves[][];
 
     }
 }
