@@ -57,6 +57,11 @@ public class ChessPiece {
         var moves = new HashSet<ChessMove>();
 
         //6 sub-classes
+        if (getPieceType() == type.KING) {
+            //ClassName objectName = new ClassName(constructorArguments);
+            PieceMovesCalculator kingMoves = new PieceMovesCalculator ();
+            kingMoves.KingMovesCalculator(myPosition);
+        }
 
         return moves;
     }

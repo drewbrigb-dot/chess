@@ -11,8 +11,8 @@ import java.util.Objects;
 public class ChessPosition {
 
 
-    private final int row;
-    private final int col;
+    private int row;
+    private int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
@@ -26,6 +26,10 @@ public class ChessPosition {
     public int getRow() {
         return row;
     }
+    public void setRow(int rowNew) {
+        row = rowNew;
+    }
+
 
 
     /**
@@ -34,6 +38,9 @@ public class ChessPosition {
      */
     public int getColumn() {
         return col;
+    }
+    public void setColumn(int colNew) {
+        col = colNew;
     }
 
     @Override
