@@ -26,9 +26,10 @@ public class ChessPosition {
     public int getRow() {
         return row;
     }
-    public void setRow(int rowNew) {
+    /*public void setRowAndCol(int rowNew, int colNew) {
         row = rowNew;
-    }
+        col = colNew;
+    } */
 
 
 
@@ -39,9 +40,7 @@ public class ChessPosition {
     public int getColumn() {
         return col;
     }
-    public void setColumn(int colNew) {
-        col = colNew;
-    }
+
 
     @Override
     public String toString() {

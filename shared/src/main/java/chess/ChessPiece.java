@@ -30,6 +30,7 @@ public class ChessPiece {
         KNIGHT,
         ROOK,
         PAWN
+
     }
 
     /**
@@ -60,7 +61,12 @@ public class ChessPiece {
         if (getPieceType() == type.KING) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator kingMoves = new PieceMovesCalculator ();
-            kingMoves.KingMovesCalculator(myPosition);
+            moves = kingMoves.KingMovesCalculator(myPosition, board);
+        }
+        if (getPieceType() == type.KNIGHT) {
+            //ClassName objectName = new ClassName(constructorArguments);
+            PieceMovesCalculator kingMoves = new PieceMovesCalculator ();
+            moves = kingMoves.KnightMovesCalculator(myPosition, board);
         }
 
         return moves;
