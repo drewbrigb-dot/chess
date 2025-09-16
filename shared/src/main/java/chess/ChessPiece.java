@@ -73,6 +73,11 @@ public class ChessPiece {
             PieceMovesCalculator queenMoves = new PieceMovesCalculator ();
             moves = queenMoves.QueenMovesCalculator(myPosition, board);
         }
+        if (getPieceType() == type.ROOK) {
+            //ClassName objectName = new ClassName(constructorArguments);
+            PieceMovesCalculator rookMoves = new PieceMovesCalculator ();
+            moves = rookMoves.RookMovesCalculator(myPosition, board);
+        }
 
         return moves;
     }
