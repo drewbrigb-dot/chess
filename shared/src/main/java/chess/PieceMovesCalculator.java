@@ -259,7 +259,25 @@ public class PieceMovesCalculator {
     public HashSet PawnMovesCalculator (ChessPosition position, ChessBoard board){
         HashSet<ChessMove> moves = new HashSet<>();
 
+        int row = position.getRow();
+        int col = position.getColumn();
 
+        int tempRow = row;
+        int tempCol = col;
+        // white initial
+        if (row == 2 && board.getPiece(position).getTeamColor() == ChessGame.TeamColor.WHITE) {
+
+            ChessPosition end = new ChessPosition(tempRow + 1, col);
+            if (board.getPiece(end) != null && board.getPiece(end).getTeamColor() == board.getPiece(position).getTeamColor()) {
+                ;
+            }
+            ChessMove potentialMove = new ChessMove(position,end, null);
+            moves.add(potentialMove);
+
+            end = new ChessPosition(tempRow + 2, col);
+            potentialMove = new ChessMove(position,end, null);
+            moves.add(potentialMove);
+        }
 
         return moves;
     }
