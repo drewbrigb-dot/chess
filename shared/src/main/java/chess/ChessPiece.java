@@ -68,6 +68,11 @@ public class ChessPiece {
             PieceMovesCalculator kingMoves = new PieceMovesCalculator ();
             moves = kingMoves.KnightMovesCalculator(myPosition, board);
         }
+        if (getPieceType() == type.QUEEN) {
+            //ClassName objectName = new ClassName(constructorArguments);
+            PieceMovesCalculator queenMoves = new PieceMovesCalculator ();
+            moves = queenMoves.QueenMovesCalculator(myPosition, board);
+        }
 
         return moves;
     }
