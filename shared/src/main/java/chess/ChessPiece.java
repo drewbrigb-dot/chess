@@ -84,6 +84,11 @@ public class ChessPiece {
             moves = bishopMoves.BishopMovesCalculator(myPosition, board);
         }
 
+        if (getPieceType() == type.PAWN) {
+            //ClassName objectName = new ClassName(constructorArguments);
+            PieceMovesCalculator pawnMoves = new PieceMovesCalculator ();
+            moves = pawnMoves.PawnMovesCalculator(myPosition, board);
+        }
         return moves;
     }
 
