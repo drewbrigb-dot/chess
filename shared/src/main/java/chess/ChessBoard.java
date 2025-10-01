@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -46,104 +47,60 @@ public class ChessBoard {
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
-        // pawn
-        ChessPosition pos  = new ChessPosition(0,0);
-            //ROW 1
-        ChessPiece piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        int i = 2;
-        for (int j =1; j < 9; j++) {
-            pos = new ChessPosition(i,j);
-            addPiece(pos,piece);
+        ArrayList<ChessPiece.PieceType> types = new ArrayList<>();
+        types.add(ChessPiece.PieceType.ROOK);
+        types.add(ChessPiece.PieceType.KNIGHT);
+        types.add(ChessPiece.PieceType.BISHOP);
+        types.add(ChessPiece.PieceType.QUEEN);
+        types.add(ChessPiece.PieceType.KING);
+        types.add(ChessPiece.PieceType.BISHOP);
+        types.add(ChessPiece.PieceType.KNIGHT);
+        types.add(ChessPiece.PieceType.ROOK);
+
+        //pawn
+        int row = 2;
+        int col = 1;
+
+        while (col < 9) {
+            ChessPosition position = new ChessPosition(row,col);
+            ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            addPiece(position,pawn);
+            col++;
         }
-            //ROW 7
-        i = 7;
-        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-        for (int j =1; j < 9; j++) {
-            pos = new ChessPosition(i,j);
-            addPiece(pos,piece);
+        row = 7;
+        col =1;
+        while (col < 9) {
+            ChessPosition position = new ChessPosition(row, col);
+            ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            addPiece(position,pawn);
+            col++;
         }
+        ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
+        row = 1;
 
-        //Rook
-            //White
-        i = 1;
-        pos = new ChessPosition( i , 1);
-        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-        addPiece(pos,piece);
-        pos = new ChessPosition( i , 8);
-        addPiece(pos,piece);
-            //Black
-        i = 8;
-        pos = new ChessPosition( i , 1);
-        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-        addPiece(pos,piece);
-        pos = new ChessPosition( i , 8);
-        addPiece(pos,piece);
-
-        //Knight
-            //WHITE
-        i=1;
-        pos = new ChessPosition( i , 2);
-        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-        addPiece(pos,piece);
-        pos = new ChessPosition( i , 7);
-        addPiece(pos,piece);
-
-            //BLACK
-        i=8;
-        pos = new ChessPosition( i , 2);
-        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-        addPiece(pos,piece);
-        pos = new ChessPosition( i , 7);
-        addPiece(pos,piece);
-
-        //Bishop
-            //WHITE
-        i=1;
-        pos = new ChessPosition( i , 3);
-        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-        addPiece(pos,piece);
-        pos = new ChessPosition( i , 6);
-        addPiece(pos,piece);
-
-            //BLACK
-        i=8;
-        pos = new ChessPosition( i , 3);
-        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-        addPiece(pos,piece);
-        pos = new ChessPosition( i , 6);
-        addPiece(pos,piece);
-
-        //QUEEN
-            //WHITE
-        i=1;
-        pos = new ChessPosition( i , 4);
-        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
-        addPiece(pos,piece);
-            //BLACK
-        i=8;
-        pos = new ChessPosition( i , 4);
-        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-        addPiece(pos,piece);
-
-        //KING
-            //WHITE
-        i=1;
-        pos = new ChessPosition( i , 5);
-        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
-        addPiece(pos,piece);
-
-            //BLACK
-        i=8;
-        pos = new ChessPosition( i , 5);
-        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
-        addPiece(pos,piece);
+        for (int j=0; j < 2; j++) {
+            col = 1;
+            for(ChessPiece.PieceType type: types) {
+                ChessPosition position = new ChessPosition(row,col);
+                ChessPiece piece = new ChessPiece(color,type);
+                addPiece(position,piece);
+                col++;
+            }
+            color = ChessGame.TeamColor.BLACK;
+            row = 8;
 
 
-
-
+        }
 
 
     }
+
+
+
+
+
+
+
 
     @Override
     public boolean equals(Object o) {
