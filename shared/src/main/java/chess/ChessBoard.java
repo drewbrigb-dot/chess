@@ -16,6 +16,9 @@ public class ChessBoard {
     public ChessBoard() {
         board = new ChessPiece[8][8];
     }
+    public ChessBoard(ChessBoard boardCopy) {
+
+    }
     // two dimensional array
     /**
      * Adds a chess piece to the chessboard
