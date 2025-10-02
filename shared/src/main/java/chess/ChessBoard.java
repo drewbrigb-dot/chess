@@ -17,6 +17,21 @@ public class ChessBoard {
         board = new ChessPiece[8][8];
     }
     public ChessBoard(ChessBoard boardCopy) {
+        board = new ChessPiece[8][8];
+        int row = 1;
+        for (ChessPiece[] pieces: boardCopy.board) {
+            int col = 1;
+            for (ChessPiece piece: pieces) {
+                ChessPosition position = new ChessPosition(row,col);
+                ChessPiece copy;
+                if (piece != null) {
+                    copy = new ChessPiece(piece.getTeamColor(),piece.getPieceType());
+                }else { copy = null;}
+                addPiece(position,copy);
+                col++;
+            }
+            row++;
+        }
 
     }
     // two dimensional array
@@ -97,10 +112,6 @@ public class ChessBoard {
 
 
     }
-
-
-
-
 
 
 

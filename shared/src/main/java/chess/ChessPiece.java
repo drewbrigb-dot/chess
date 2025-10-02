@@ -93,6 +93,11 @@ public class ChessPiece {
     }
 
     @Override
+    public String toString() {
+        return type + " " + pieceColor;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof ChessPiece piece)) {
             return false;
