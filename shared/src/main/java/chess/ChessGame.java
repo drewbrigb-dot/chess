@@ -196,35 +196,32 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition kingPosition = null;
+        //ChessPosition kingPosition = null;
         if (isInCheck(teamColor) == true) {
 
             for (int row = 1; row < 9; row++) {
                 for (int col = 1; col < 9; col++) {
-                    ChessPosition position = new ChessPosition(row,col);
+                    ChessPosition position = new ChessPosition(row, col);
                     if (board.getPiece(position) != null) {
-                        if (board.getPiece(position).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(position).getTeamColor() == teamColor ) {
-                            kingPosition = position;
+                        if (board.getPiece(position).getTeamColor() == teamColor) {
+                            Collection<ChessMove> pieceMoves = validMoves(position);
+
+                            for (ChessMove move : pieceMoves) {
+                                ChessBoard boardClone = new ChessBoard(board);
+                                try {
+                                    makeMove(move);
+
+                                    if (isInCheck(teamColor) != true) {
+                                        return false;
+                                    }
+                                } catch (InvalidMoveException e) {
+                                }
+                                board = boardClone;
+                            }
                         }
                     }
-            }
-        }
-
-            Collection <ChessMove> kingMoves =  validMoves(kingPosition);
-
-            for (ChessMove move: kingMoves) {
-                ChessBoard boardClone = new ChessBoard(board);
-                try {
-                    makeMove(move);
-
-                    if (isInCheck(teamColor)!=true) {
-                        return false;
-                    }
-                }catch (InvalidMoveException e) {
                 }
-                board = boardClone;
             }
-
             return true;
         }
         return false;
@@ -238,8 +235,41 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor ogColor = getTeamTurn();
+        if (isInCheck(teamColor) != true) {
+            if(teamColor != getTeamTurn()) {
+                setTeamTurn(teamColor);
+            }
+
+            for (int row = 1; row < 9; row++) {
+                for (int col = 1; col < 9; col++) {
+                    ChessPosition position = new ChessPosition(row, col);
+                    if (board.getPiece(position) != null) {
+                        if (board.getPiece(position).getTeamColor() == teamColor) {
+                            Collection<ChessMove> pieceMoves = validMoves(position);
+
+                            for (ChessMove move : pieceMoves) {
+                                ChessBoard boardClone = new ChessBoard(board);
+                                try {
+                                    makeMove(move);
+                                    if (isInCheck(teamColor) != true) {
+                                        setTeamTurn(ogColor);
+                                        return false;
+                                    }
+                                } catch (InvalidMoveException e) {
+                                }
+                                board = boardClone;
+                            }
+                        }
+                    }
+                }
+            }
+            setTeamTurn(ogColor);
+            return true;
+        }
+        return false;
     }
+
 
     /**
      * Sets this game's chessboard with a given board
