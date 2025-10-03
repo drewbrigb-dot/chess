@@ -61,33 +61,33 @@ public class ChessPiece {
         if (getPieceType() == type.KING) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator kingMoves = new PieceMovesCalculator ();
-            moves = kingMoves.KingMovesCalculator(myPosition, board);
+            moves = kingMoves.kingMovesCalculator(myPosition, board);
         }
         if (getPieceType() == type.KNIGHT) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator kingMoves = new PieceMovesCalculator ();
-            moves = kingMoves.KnightMovesCalculator(myPosition, board);
+            moves = kingMoves.knightMovesCalculator(myPosition, board);
         }
         if (getPieceType() == type.QUEEN) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator queenMoves = new PieceMovesCalculator ();
-            moves = queenMoves.QueenMovesCalculator(myPosition, board);
+            moves = queenMoves.queenMovesCalculator(myPosition, board);
         }
         if (getPieceType() == type.ROOK) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator rookMoves = new PieceMovesCalculator ();
-            moves = rookMoves.RookMovesCalculator(myPosition, board);
+            moves = rookMoves.rookMovesCalculator(myPosition, board);
         }
         if (getPieceType() == type.BISHOP) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator bishopMoves = new PieceMovesCalculator ();
-            moves = bishopMoves.BishopMovesCalculator(myPosition, board);
+            moves = bishopMoves.bishopMovesCalculator(myPosition, board);
         }
 
         if (getPieceType() == type.PAWN) {
             //ClassName objectName = new ClassName(constructorArguments);
             PieceMovesCalculator pawnMoves = new PieceMovesCalculator ();
-            moves = pawnMoves.PawnMovesCalculator(myPosition, board);
+            moves = pawnMoves.pawnMovesCalculator(myPosition, board);
         }
         return moves;
     }

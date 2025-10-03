@@ -89,7 +89,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
 
-        Collection <ChessMove> moves = new HashSet<>();
+        Collection <ChessMove> moves;
 
 
         ChessPosition startPosition = move.getStartPosition();
@@ -123,31 +123,6 @@ public class ChessGame {
         }else {
             throw new InvalidMoveException("Invalid Move");
         }
-
-        /*ChessPosition startPosition = move.getStartPosition();
-        ChessPosition endPosition = move.getEndPosition();
-        ChessPiece movingPiece = board.getPiece(startPosition);
-
-
-        if (movingPiece != null ) {
-            TeamColor teamColor = movingPiece.getTeamColor();
-            if (teamColor == getTeamTurn()) {
-                if (board.getPiece(endPosition) == null) {
-                    board.addPiece(endPosition, movingPiece);
-                    board.addPiece(startPosition, null);
-                    setTeamTurn(teamColor);
-                } else if (board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() != getTeamTurn()) {
-                    board.addPiece(endPosition, movingPiece);
-                    setTeamTurn(teamColor);
-                } else {
-                    throw new InvalidMoveException("Invalid Move");
-                }
-            } else {
-                throw new InvalidMoveException("Invalid Move");
-            }
-        }else {
-            throw new InvalidMoveException("Invalid Move");
-        }*/
     }
 
 

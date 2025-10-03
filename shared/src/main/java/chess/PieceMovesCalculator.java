@@ -6,7 +6,7 @@ import java.util.HashSet;
 public class PieceMovesCalculator {
     HashSet<ChessMove> moves = new HashSet<>();
 
-    public HashSet KingMovesCalculator (ChessPosition position, ChessBoard board) {
+    public HashSet kingMovesCalculator (ChessPosition position, ChessBoard board) {
         int directions[][] = {{1,1},{-1,1},{-1,-1},{1,-1},{1,0},{0,1},{-1,0},{0,-1}};
         for (int i =0; i <directions.length; i++) {
             int row = position.getRow() + directions[i][0];
@@ -31,7 +31,7 @@ public class PieceMovesCalculator {
     }
 
 
-    public HashSet QueenMovesCalculator (ChessPosition position, ChessBoard board){
+    public HashSet queenMovesCalculator (ChessPosition position, ChessBoard board){
         int directions[][] = {{1,1},{-1,1},{-1,-1},{1,-1},{1,0},{0,1},{-1,0},{0,-1}};
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
 
@@ -65,7 +65,7 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    public HashSet KnightMovesCalculator(ChessPosition position, ChessBoard board) {
+    public HashSet knightMovesCalculator(ChessPosition position, ChessBoard board) {
         int directions[][] = {{2,1},{1,2}, {-1,2},{-2,1},{-1,-2},{-2,-1}, {1,-2},{2,-1}};
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
 
@@ -89,7 +89,7 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    public HashSet PawnMovesCalculator (ChessPosition position, ChessBoard board) {
+    public HashSet pawnMovesCalculator (ChessPosition position, ChessBoard board) {
         int directions[][] = {{1, 0}, {1, 1}, {1, -1}};
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
         ArrayList<ChessPiece.PieceType> promoType = new ArrayList<>();
@@ -209,7 +209,7 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    public HashSet BishopMovesCalculator (ChessPosition position, ChessBoard board){
+    public HashSet bishopMovesCalculator (ChessPosition position, ChessBoard board){
         int directions[][] = {{1,1},{-1,1},{-1,-1},{1,-1}};
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
 
@@ -243,7 +243,7 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    public HashSet RookMovesCalculator (ChessPosition position, ChessBoard board){
+    public HashSet rookMovesCalculator (ChessPosition position, ChessBoard board){
         int directions[][] = {{1,0},{0,1},{-1,0},{0,-1}};
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
 
