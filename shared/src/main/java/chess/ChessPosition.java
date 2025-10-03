@@ -26,10 +26,6 @@ public class ChessPosition {
     public int getRow() {
         return row;
     }
-    /*public void setRowAndCol(int rowNew, int colNew) {
-        row = rowNew;
-        col = colNew;
-    } */
 
 
 
