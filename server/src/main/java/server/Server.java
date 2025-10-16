@@ -1,16 +1,22 @@
 package server;
 
+import dataaccess.MemoryDataAccess;
+import model.*;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.UserService;
 
-import java.util.Map;
+
 
 public class Server {
 
     private final Javalin server;
+    private final UserService userService;
 
     public Server() {
+        var dataAccess = new MemoryDataAccess();
+        userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("db",ctx -> ctx.result("{}"));
@@ -20,14 +26,20 @@ public class Server {
     }
 
     private void register (Context ctx) {
-        var serializer = new Gson();
-        String reqJson = ctx.body();
-        var req = serializer.fromJson(reqJson, Map.class);
+        try {
+            var serializer = new Gson();
+            String reqJson = ctx.body();
+            var req = serializer.fromJson(reqJson, UserData.class);
 
-        //call to the service and register
+            //call to the service and register
+            userService.register(user);
 
-        var res = Map.of("username", req.get("username"),"authToken","yzx");
-        ctx.result(serializer.toJson(res));
+
+            ctx.result(serializer.toJson(authData));
+        }catch (Exception ex) {
+            var msg = String.format("Error: username already taken");
+            ctx.status(403).result(msg);
+        }
 
     }
 
