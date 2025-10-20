@@ -1,14 +1,17 @@
 package service;
 
-import dataaccess.DataAccess;
+import dataaccess.UserDataAccess;
+
 import model.*;
 
+import java.util.UUID;
+
 public class UserService {
-    private final DataAccess dataAccess;
-    public UserService (DataAccess dataAccess) {
+    private final UserDataAccess dataAccess;
+    public UserService (UserDataAccess dataAccess) {
         this.dataAccess=dataAccess;
     }
-    public AuthData register(UserData user) {
+    public AuthData register(UserData user) throws Exception {
         if (dataAccess.getUser(user.username()) != null){
             throw new Exception("already exists");
         }
@@ -17,6 +20,6 @@ public class UserService {
     }
 
     private String generateAuthToken () {
-        return "xyz";
+        return UUID.randomUUID().toString();
     }
 }

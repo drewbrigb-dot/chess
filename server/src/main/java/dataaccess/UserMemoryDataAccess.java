@@ -1,14 +1,17 @@
 package dataaccess;
 
 
+import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
 
-public class MemoryDataAccess implements DataAccess {
+public class UserMemoryDataAccess implements UserDataAccess {
 
     private final HashMap<String,UserData> users = new HashMap<>();
-    //private final HashMap<String, AuthData> usersAuth = new HashMap<>();
+
+
 
     @Override
     public void clear() {
@@ -22,7 +25,6 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public UserData getUser(String username) {
-
         return users.get(username);
     }
 }

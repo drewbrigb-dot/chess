@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
+import dataaccess.UserDataAccess;
+import dataaccess.UserMemoryDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ class UserServiceTest {
 
     @Test
     void register() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        UserDataAccess db = new UserMemoryDataAccess();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
         var userService = new UserService(db);
         var authData = userService.register(user);
@@ -22,7 +22,7 @@ class UserServiceTest {
     }
     @Test
     void registerInvalidUsername() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        UserDataAccess db = new UserMemoryDataAccess();
         var user = new UserData("", "j@j.com", "toomanysecrets");
         var userService = new UserService(db);
         var authData = userService.register(user);
@@ -32,7 +32,13 @@ class UserServiceTest {
 
     }
     @Test
-    void clear() {
+    void clear() throws Exception{
+        UserDataAccess db = new UserMemoryDataAccess();
+        var user = new UserData("", "j@j.com", "toomanysecrets");
+        var userService = new UserService(db);
+        var authData = userService.register(user);
+
+        db.clear();
 
     }
 }
