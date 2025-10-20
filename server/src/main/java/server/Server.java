@@ -32,10 +32,10 @@ public class Server {
             var req = serializer.fromJson(reqJson, UserData.class);
 
             //call to the service and register
-            userService.register(user);
+            //userService.register(user);
 
 
-            ctx.result(serializer.toJson(authData));
+            //ctx.result(serializer.toJson(authData));
         }catch (Exception ex) {
             var msg = String.format("Error: username already taken");
             ctx.status(403).result(msg);
