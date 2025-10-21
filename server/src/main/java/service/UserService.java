@@ -12,9 +12,9 @@ import java.util.UUID;
 public class UserService {
     private final UserDataAccess userData;
     private final AuthDataAccess authData;
-    public UserService (UserDataAccess userData) {
-        this.userData=userData;
-        authData = new AuthMemoryDataAccess();
+    public UserService (UserDataAccess userDataAccess, AuthDataAccess authDataAccess) {
+        userData = userDataAccess;
+        authData = authDataAccess;
 
     }
     public AuthData register(UserData user) throws Exception {
@@ -61,11 +61,12 @@ public class UserService {
     private String generateAuthToken () {
         return UUID.randomUUID().toString();
     }
-    void clearData () {
-        userData.clear();
-        authData.clearAuth();
-    }
+
     boolean isAuthDataEmpty() {
         return authData.isEmpty();
+    }
+
+    public AuthDataAccess getAuthData () {
+        return authData;
     }
 }
