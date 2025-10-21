@@ -1,7 +1,10 @@
 package dataaccess;
 
+import model.*;
+
 public interface AuthDataAccess {
-    void createAuth();
+    void clearAuth();
+    void createAuth(AuthData authData);
     String getAuth(String authToken);
     void deleteAuth(String authToken);
 }

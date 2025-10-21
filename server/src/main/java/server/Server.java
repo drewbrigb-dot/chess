@@ -34,10 +34,21 @@ public class Server {
 
             //call to the service and register
             AuthData authData = userService.register(user);
+            ctx.status(200);
             ctx.result(serializer.toJson(authData));
+
         }catch (Exception ex) {
-            var msg = String.format("Error: username already taken");
-            ctx.status(403).result(msg);
+            if (ex.getMessage().equals("Error: already exists")) {
+                var msg = String.format("Error: username already taken");
+                ctx.status(403).result(msg);
+            }
+            else if (ex.getMessage().equals("Error: bad request")) {
+                var msg = String.format("Error: bad request");
+                ctx.status(400).result(msg);
+            } else {
+                var msg = String.format("Error: welp");
+                ctx.status(500).result(msg);
+            }
         }
 
     }
