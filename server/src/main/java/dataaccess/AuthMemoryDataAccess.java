@@ -18,12 +18,17 @@ public class AuthMemoryDataAccess implements AuthDataAccess {
     }
 
     @Override
-    public String getAuth(String authToken) {
-        return "";
+    public AuthData getAuth(String authToken) {
+        return usersAuth.get(authToken);
     }
 
     @Override
     public void deleteAuth(String authToken) {
+        usersAuth.remove(authToken);
+    }
 
+    @Override
+    public boolean isEmpty() {
+        return usersAuth.isEmpty();
     }
 }

@@ -7,6 +7,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import service.UserService;
 
+import java.util.Map;
 
 
 public class Server {
@@ -23,12 +24,66 @@ public class Server {
         server.delete("db",ctx -> ctx.result("{}"));
         //endpoints
         server.post("user", ctx->register(ctx));
+        server.post("session", ctx->login(ctx));
+        server.delete("session", ctx->logout(ctx));
 
     }
 
-    private void register (Context ctx) {
+    private void login (Context ctx ) {
+        var serializer = new Gson();
         try {
-            var serializer = new Gson();
+            String reqJson = ctx.body();
+            var user = serializer.fromJson(reqJson, UserData.class);
+
+            //call to the service and register
+            AuthData authData = userService.login(user);
+
+            ctx.status(200);
+            ctx.result(serializer.toJson(authData));
+
+        }catch (Exception ex) {
+            if (ex.getMessage().equals("Error: unauthorized")) {
+                var msg = Map.of("message","Error: unauthorized");
+                ctx.status(401).result(serializer.toJson(msg));
+            }
+            else if (ex.getMessage().equals("Error: bad request")) {
+                var msg = Map.of("message","Error: bad request");
+                ctx.status(400).result(serializer.toJson(msg));
+            } else {
+                var msg = Map.of("message","Error: welp");
+                ctx.status(500).result(serializer.toJson(msg));
+            }
+        }
+    }
+
+    private void logout (Context ctx ) {
+        var serializer = new Gson();
+        try {
+            String reqJson;
+
+            String authToken = ctx.header("authorization");
+
+            //call to the service and register
+            userService.logout(authToken);
+
+            ctx.status(200);
+            ctx.result("{}");
+
+        }catch (Exception ex) {
+            if (ex.getMessage().equals("Error: unauthorized")) {
+                var msg = Map.of("message","Error: unauthorized");
+                ctx.status(401).result(serializer.toJson(msg));
+            }
+            else {
+                var msg = Map.of("message","Error: welp");
+                ctx.status(500).result(serializer.toJson(msg));
+            }
+        }
+    }
+
+    private void register (Context ctx) {
+        var serializer = new Gson();
+        try {
             String reqJson = ctx.body();
             var user = serializer.fromJson(reqJson, UserData.class);
 
@@ -39,15 +94,15 @@ public class Server {
 
         }catch (Exception ex) {
             if (ex.getMessage().equals("Error: already exists")) {
-                var msg = String.format("Error: username already taken");
-                ctx.status(403).result(msg);
+                var msg = Map.of("message", "Error: username already taken");
+                ctx.status(403).result(serializer.toJson(msg));
             }
             else if (ex.getMessage().equals("Error: bad request")) {
-                var msg = String.format("Error: bad request");
-                ctx.status(400).result(msg);
+                var msg = Map.of("message","Error: bad request");
+                ctx.status(400).result(serializer.toJson(msg));
             } else {
-                var msg = String.format("Error: welp");
-                ctx.status(500).result(msg);
+                var msg = Map.of("message","Error: welp");
+                ctx.status(500).result(serializer.toJson(msg));
             }
         }
 

@@ -1,9 +1,14 @@
 package service;
 
+import dataaccess.AuthDataAccess;
+import dataaccess.AuthMemoryDataAccess;
 import dataaccess.UserDataAccess;
 import dataaccess.UserMemoryDataAccess;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +24,67 @@ class UserServiceTest {
         assertEquals(user.username(),authData.username());
         assertTrue(!authData.authToken().isEmpty());
 
+    }
+    @Test
+    void login() throws Exception {
+        UserDataAccess db = new UserMemoryDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(db);
+        userService.register(user);
+
+        AuthData authData = userService.login(user);
+        assertEquals("joe",authData.username());
+    }
+    @Test
+    void logout() throws Exception {
+        UserDataAccess db = new UserMemoryDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(db);
+        AuthData authData = userService.register(user);
+
+        userService.login(user);
+        userService.logout(authData.authToken());
+        assertEquals(true, userService.isAuthDataEmpty());
+    }
+
+    @Test
+    void logoutInvalidToken() throws Exception {
+        UserDataAccess db = new UserMemoryDataAccess();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(db);
+        AuthData authData = userService.register(user);
+
+        String randAuthToken = UUID.randomUUID().toString();
+        userService.login(user);
+        Exception e = assertThrows(Exception.class, () -> userService.logout(randAuthToken)) ;
+        assertEquals("Error: unauthorized",e.getMessage());
+
+    }
+
+
+    @Test
+    void loginWrongUsername() throws Exception {
+        UserDataAccess db = new UserMemoryDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userWrong = new UserData("joeschmo", "j@j.com", "toomanysecrets");
+        var userService = new UserService(db);
+        userService.register(user);
+
+        Exception e = assertThrows(Exception.class, () -> userService.login(userWrong));
+        assertEquals("Error: unauthorized",e.getMessage());
+    }
+
+    @Test
+    void loginNullPassword() throws Exception {
+        UserDataAccess db = new UserMemoryDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userWrong = new UserData("joe", "j@j.com",null);
+        var userService = new UserService(db);
+        userService.register(user);
+
+        Exception e = assertThrows(Exception.class, () -> userService.login(userWrong));
+        assertEquals("Error: bad request",e.getMessage());
     }
     @Test
     void registerNullUsername() throws Exception {
@@ -45,9 +111,10 @@ class UserServiceTest {
         UserDataAccess db = new UserMemoryDataAccess();
         var user = new UserData("", "j@j.com", "toomanysecrets");
         var userService = new UserService(db);
-        var authData = userService.register(user);
+        userService.register(user);
+        userService.clearData();
 
-        db.clear();
+        assertTrue(db.isEmpty());
 
     }
 }

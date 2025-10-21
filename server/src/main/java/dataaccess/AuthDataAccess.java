@@ -5,6 +5,7 @@ import model.*;
 public interface AuthDataAccess {
     void clearAuth();
     void createAuth(AuthData authData);
-    String getAuth(String authToken);
+    AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
+    boolean isEmpty();
 }

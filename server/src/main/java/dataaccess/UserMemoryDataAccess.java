@@ -6,6 +6,7 @@ import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class UserMemoryDataAccess implements UserDataAccess {
 
@@ -26,5 +27,17 @@ public class UserMemoryDataAccess implements UserDataAccess {
     @Override
     public UserData getUser(String username) {
         return users.get(username);
+    }
+    public boolean isEmpty () {
+        return users.isEmpty();
+    }
+
+    public boolean validateUser(String username, String password) {
+
+        UserData user = getUser(username);
+        if (users.get(username) != null && Objects.equals(user.password(), password)) {
+            return true;
+        }else {return false;}
+
     }
 }
