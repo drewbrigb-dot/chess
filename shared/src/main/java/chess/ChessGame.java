@@ -169,35 +169,33 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         //ChessPosition kingPosition = null;
-        if (isInCheck(teamColor) == true) {
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
 
-            for (int row = 1; row < 9; row++) {
-                for (int col = 1; col < 9; col++) {
-                    ChessPosition position = new ChessPosition(row, col);
-                    ChessPiece currPiece = board.getPiece(position);
-                    if (currPiece == null || currPiece.getTeamColor() != teamColor) {
-                        continue;
-                    }
-                    Collection<ChessMove> pieceMoves = validMoves(position);
-                    for (ChessMove move : pieceMoves) {
-                        ChessBoard boardClone = new ChessBoard(board);
-                        try {
-                            makeMove(move);
-
-                            if (isInCheck(teamColor) != true) {
-                                return false;
-                            }
-                        } catch (InvalidMoveException e) {
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece currPiece = board.getPiece(position);
+                if (currPiece == null || currPiece.getTeamColor() != teamColor) {
+                    continue;
+                }
+                Collection<ChessMove> pieceMoves = validMoves(position);
+                for (ChessMove move : pieceMoves) {
+                    ChessBoard boardClone = new ChessBoard(board);
+                    try {
+                        makeMove(move);
+                        if (!isInCheck(teamColor)) {
+                            return false;
                         }
-                        board = boardClone;
+                    } catch (InvalidMoveException e) {
                     }
+                    board = boardClone;
                 }
             }
-            return true;
         }
-        return false;
+        return true;
     }
-
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
@@ -220,14 +218,10 @@ public class ChessGame {
 
                 for (ChessMove move : pieceMoves) {
                     ChessBoard boardClone = new ChessBoard(board);
-                    try {
-                        makeMove(move);
-                        if (isInCheck(teamColor) != true) {
-                            setTeamTurn(ogColor);
-                            return false;
-                        }
-                    } catch (InvalidMoveException e) {
-                    }
+
+                    if (!tryHelper(move,teamColor)){
+                        return false;
+                    };
                     board = boardClone;
                 }
             }
@@ -237,6 +231,16 @@ public class ChessGame {
     }
 
 
+    private boolean tryHelper (ChessMove move, TeamColor teamColor) {
+        try {
+            makeMove(move);
+            if (!isInCheck(teamColor)) {
+                return false;
+            }
+        } catch (InvalidMoveException e) {
+        }
+        return true;
+    }
 
     /**
      * Sets this game's chessboard with a given board
