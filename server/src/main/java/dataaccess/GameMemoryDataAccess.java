@@ -52,12 +52,6 @@ public class GameMemoryDataAccess implements GameDataAccess {
         String whiteUsername = oldGame.whiteUsername();
         String blackUsername = oldGame.blackUsername();
 
-       /* if (oldGame.whiteUsername().isEmpty()) {
-            whiteUsername = null;
-        }
-        if (oldGame.blackUsername().isEmpty()) {
-            blackUsername = null;
-        }*/
         GameData newGame;
         if (playerColor == ChessGame.TeamColor.BLACK) {
             newGame = new GameData(gameID, whiteUsername, newUsername, oldGame.gameName(), oldGame.game());
