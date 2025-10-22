@@ -42,14 +42,7 @@ public class PieceMovesCalculator {
             while (row < 9 && row > 0 && col < 9 && col >0) {
                 ChessPosition positionNew = new ChessPosition(row,col);
 
-                if (board.getPiece(positionNew) == null) {
-                    ChessMove move = new ChessMove(position, positionNew, null);
-                    moves.add(move);
-                }else if (board.getPiece(positionNew).getTeamColor() != color){
-                    ChessMove move = new ChessMove(position, positionNew, null);
-                    moves.add(move);
-                    break;
-                }else {
+                if(addMoves(board,positionNew,position,color)) {
                     break;
                 }
 
@@ -220,14 +213,7 @@ public class PieceMovesCalculator {
             while (row < 9 && row > 0 && col < 9 && col >0) {
                 ChessPosition positionNew = new ChessPosition(row,col);
 
-                if (board.getPiece(positionNew) == null) {
-                    ChessMove move = new ChessMove(position, positionNew, null);
-                    moves.add(move);
-                }else if (board.getPiece(positionNew).getTeamColor() != color){
-                    ChessMove move = new ChessMove(position, positionNew, null);
-                    moves.add(move);
-                    break;
-                }else {
+                if(addMoves(board,positionNew,position,color)) {
                     break;
                 }
 
@@ -253,16 +239,10 @@ public class PieceMovesCalculator {
 
             while (row < 9 && row > 0 && col < 9 && col >0) {
                 ChessPosition positionNew = new ChessPosition(row,col);
-                if (board.getPiece(positionNew) == null) {
-                    ChessMove move = new ChessMove(position, positionNew, null);
-                    moves.add(move);
-                }else if (board.getPiece(positionNew).getTeamColor() != color){
-                    ChessMove move = new ChessMove(position, positionNew, null);
-                    moves.add(move);
-                    break;
-                }else {
-                    break;
-                }
+
+               if(addMoves(board,positionNew,position,color)) {
+                   break;
+               }
 
                 if (directions[i][0] > 0) {
                     row++;
@@ -275,5 +255,23 @@ public class PieceMovesCalculator {
 
         return moves;
     }
+    private Boolean addMoves (ChessBoard board, ChessPosition positionNew, ChessPosition position, ChessGame.TeamColor color) {
+        if (board.getPiece(positionNew) == null) {
+            ChessMove move = new ChessMove(position, positionNew, null);
+            moves.add(move);
+        }else if (board.getPiece(positionNew).getTeamColor() != color){
+            ChessMove move = new ChessMove(position, positionNew, null);
+            moves.add(move);
+            return Boolean.TRUE;
+        }else {
+            return Boolean.TRUE;
+        }
+        return false;
+
+
+    }
 }
+
+
+
 
