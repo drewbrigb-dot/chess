@@ -41,7 +41,22 @@ public class GameMemoryDataAccess implements GameDataAccess {
     }
 
     @Override
-    public ArrayList<String> listOfGames(String authToken) {
-        return null;
+    public ArrayList<GameData> listOfGames() {
+        ArrayList<GameData> gameList = new ArrayList<>(gameData.values());
+        return gameList;
+    }
+
+    @Override
+    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String newUsername) {
+        GameData oldGame = gameData.get(gameID);
+        GameData newGame;
+        if (playerColor == ChessGame.TeamColor.BLACK) {
+            newGame = new GameData(gameID, oldGame.whiteUsername(), newUsername, oldGame.gameName(), oldGame.game());
+        }else {
+            newGame = new GameData(gameID, newUsername, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
+        }
+        gameData.remove(gameID);
+        gameData.put(gameID,newGame);
+
     }
 }
