@@ -47,7 +47,7 @@ class UserServiceTest {
 
         userService.login(user);
         userService.logout(authData.authToken());
-        assertEquals(true, dbUser);
+        assertEquals(user, dbUser.getUser(user.username()));
     }
 
     @Test
