@@ -183,13 +183,9 @@ public class ChessGame {
                 Collection<ChessMove> pieceMoves = validMoves(position);
                 for (ChessMove move : pieceMoves) {
                     ChessBoard boardClone = new ChessBoard(board);
-                    try {
-                        makeMove(move);
-                        if (!isInCheck(teamColor)) {
-                            return false;
-                        }
-                    } catch (InvalidMoveException e) {
-                    }
+                    if (!tryHelper(move,teamColor)){
+                        return false;
+                    };
                     board = boardClone;
                 }
             }
