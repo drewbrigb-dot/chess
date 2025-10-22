@@ -82,19 +82,19 @@ public class PieceMovesCalculator {
                 int row = position.getRow() + directions[i][0];
                 int col = position.getColumn() + directions[i][1];
 
-                if (row < 9 && row > 0 && col < 9 && col > 0) {
-                    if (directions[i][1] == 0) {
-                        ChessPosition positionNew = new ChessPosition(row, col);
-                        pawnHelper4 ( row,  rowSpecialStartWhite,  col,  board,  positionNew,  position);
-                        pawnHelper(row, rowMax, board, positionNew, position, promoType);
-                    } else {
-                        ChessPosition positionNew = new ChessPosition(row, col);
+                if (row > 8 || row < 1 || col > 8 || col < 1) { continue;}
+                if (directions[i][1] == 0) {
+                    ChessPosition positionNew = new ChessPosition(row, col);
+                    pawnHelper4 ( row,  rowSpecialStartWhite,  col,  board,  positionNew,  position);
+                    pawnHelper(row, rowMax, board, positionNew, position, promoType);
+                } else {
+                    ChessPosition positionNew = new ChessPosition(row, col);
 
-                        if (board.getPiece(positionNew) != null && board.getPiece(positionNew).getTeamColor() != color) {
-                            pawnHelper3(row, rowMax, position, positionNew, promoType);
-                        }
+                    if (board.getPiece(positionNew) != null && board.getPiece(positionNew).getTeamColor() != color) {
+                        pawnHelper3(row, rowMax, position, positionNew, promoType);
                     }
                 }
+
 
             }
         } else {
@@ -102,7 +102,7 @@ public class PieceMovesCalculator {
                 int row = position.getRow() - directions[i][0];
                 int col = position.getColumn() - directions[i][1];
 
-                if (row < 9 && row > 0 && col < 9 && col > 0) {
+                if (row > 8 || row < 1 || col > 8 || col < 1) { continue;}
                     if (directions[i][1] == 0) {
                         ChessPosition positionNew = new ChessPosition(row, col);
 
@@ -116,11 +116,6 @@ public class PieceMovesCalculator {
                         }
 
                     }
-
-
-                }
-
-
             }
         }
     return moves;
