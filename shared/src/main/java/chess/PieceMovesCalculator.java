@@ -1,5 +1,7 @@
 package chess;
 
+import chess.ChessPiece.PieceType;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -64,11 +66,11 @@ public class PieceMovesCalculator {
     public HashSet pawnMovesCalculator (ChessPosition position, ChessBoard board) {
         int directions[][] = {{1, 0}, {1, 1}, {1, -1}};
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
-        ArrayList<ChessPiece.PieceType> promoType = new ArrayList<>();
-        promoType.add(ChessPiece.PieceType.QUEEN);
-        promoType.add(ChessPiece.PieceType.ROOK);
-        promoType.add(ChessPiece.PieceType.BISHOP);
-        promoType.add(ChessPiece.PieceType.KNIGHT);
+        ArrayList<PieceType> promoType = new ArrayList<>();
+        promoType.add(PieceType.QUEEN);
+        promoType.add(PieceType.ROOK);
+        promoType.add(PieceType.BISHOP);
+        promoType.add(PieceType.KNIGHT);
 
         if (color == ChessGame.TeamColor.WHITE) {
             for (int i = 0; i < directions.length; i++) {
@@ -96,7 +98,7 @@ public class PieceMovesCalculator {
 
                             if (board.getPiece(positionNew) != null && board.getPiece(positionNew).getTeamColor() != color) {
                                 if (row == 8) {
-                                    for (ChessPiece.PieceType type : promoType) {
+                                    for (PieceType type : promoType) {
                                         ChessMove move = new ChessMove(position, positionNew, type);
                                         moves.add(move);
                                     }
@@ -141,7 +143,7 @@ public class PieceMovesCalculator {
 
                             if (board.getPiece(positionNew) != null && board.getPiece(positionNew).getTeamColor() != color) {
                                 if (row == 1) {
-                                    for (ChessPiece.PieceType type : promoType) {
+                                    for (PieceType type : promoType) {
                                         ChessMove move = new ChessMove(position, positionNew, type);
                                         moves.add(move);
                                     }
@@ -218,10 +220,10 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    private void pawnHelper(int row, int rowEqual, ChessBoard board, ChessPosition positionNew, ChessPosition position, ArrayList<ChessPiece.PieceType> promoType) {
+    void pawnHelper(int row, int rowEqual, ChessBoard board, ChessPosition positionNew, ChessPosition position, ArrayList<PieceType> promoType) {
         if (row == rowEqual ) {
             if (board.getPiece(positionNew) == null) {
-                for (ChessPiece.PieceType type : promoType) {
+                for (PieceType type : promoType) {
                     ChessMove move = new ChessMove(position, positionNew, type);
                     moves.add(move);
                 }
