@@ -43,6 +43,8 @@ public class UserService {
             throw new Exception("Error: unauthorized");
         }
         AuthData auth = new AuthData(username, generateAuthToken());
+        authData.createAuth(auth);
+
         return auth;
     }
 
@@ -62,11 +64,4 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    boolean isAuthDataEmpty() {
-        return authData.isEmpty();
-    }
-
-    public AuthDataAccess getAuthData () {
-        return authData;
-    }
 }

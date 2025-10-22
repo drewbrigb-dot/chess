@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -83,5 +84,51 @@ public class GameServiceTest {
         assertEquals("Error: unauthorized", e.getMessage());
 
     }
+    @Test
+    void joinGameSuccess() throws Exception {
+        UserDataAccess dbUser = new UserMemoryDataAccess();
+        AuthDataAccess dbAuth = new AuthMemoryDataAccess();
+        GameDataAccess dbGame = new GameMemoryDataAccess();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        Integer gameID = gameService.createGame(authToken, "ChessIsStupid");
+
+        gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,user.username());
+
+        assertEquals("joe",dbGame.getGame(gameID).whiteUsername());
+    }
+
+    @Test
+    void joinGameFailure() throws Exception {
+        UserDataAccess dbUser = new UserMemoryDataAccess();
+        AuthDataAccess dbAuth = new AuthMemoryDataAccess();
+        GameDataAccess dbGame = new GameMemoryDataAccess();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userBad = new UserData("tommy", "tommy@tom.com", "toomanyshawties");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        Integer gameID = gameService.createGame(authToken, "ChessIsStupid");
+
+        gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,user.username());
+
+        Exception e = assertThrows(Exception.class, () -> gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,"tommy"));
+        assertEquals("Error: already taken", e.getMessage());
+
+
+
+    }
+
+
 
 }

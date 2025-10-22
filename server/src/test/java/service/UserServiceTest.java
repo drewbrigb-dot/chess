@@ -47,7 +47,7 @@ class UserServiceTest {
 
         userService.login(user);
         userService.logout(authData.authToken());
-        assertEquals(true, userService.isAuthDataEmpty());
+        assertEquals(true, dbUser);
     }
 
     @Test
@@ -123,7 +123,7 @@ class UserServiceTest {
         dbUser.clear();
         dbAuth.clearAuth();
 
-        assertTrue(userService.getAuthData().isEmpty());
+        assertTrue(dbAuth.isEmpty());
 
     }
 }

@@ -6,6 +6,7 @@ import model.*;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import org.eclipse.jetty.server.Authentication;
 import service.GameService;
 import service.UserService;
 
@@ -142,6 +143,7 @@ public class Server {
             String gameName = request.gameName();
             //call to the service and register
             Integer gameID = gameService.createGame(authToken,gameName);
+
             CreateResult gameResult = new CreateResult(gameID);
             ctx.status(200);
             ctx.result(serializer.toJson(gameResult));
@@ -200,13 +202,19 @@ public class Server {
             JoinGameRequest request = serializer.fromJson(reqJson, JoinGameRequest.class);
             ChessGame.TeamColor playerColor = request.playerColor();
             Integer gameID = request.gameID();
-            //call to the service and register
+
+
+            if (gameID == null) {
+                throw new Exception("Error: bad request");
+            }
+            if (authDataAccess.getAuth(authToken) == null) {
+                throw new Exception("Error: unauthorized");
+            }
             String username = authDataAccess.getAuth(authToken).username();
             gameService.joinGame(playerColor,gameID, username);
 
-            CreateResult gameResult = new CreateResult(gameID);
             ctx.status(200);
-            ctx.result(serializer.toJson(gameResult));
+            ctx.result("{}");
 
         }catch (Exception ex) {
             if (ex.getMessage().equals("Error: unauthorized")) {
@@ -216,6 +224,9 @@ public class Server {
             else if (ex.getMessage().equals("Error: bad request")) {
                 var msg = Map.of("message","Error: bad request");
                 ctx.status(400).result(serializer.toJson(msg));
+            }else if (ex.getMessage().equals("Error: already taken")) {
+                var msg = Map.of("message", "Error: already taken");
+                ctx.status(403).result(serializer.toJson(msg));
             } else {
                 var msg = Map.of("message","Error: welp");
                 ctx.status(500).result(serializer.toJson(msg));

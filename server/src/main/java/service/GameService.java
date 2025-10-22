@@ -49,15 +49,23 @@ public class GameService {
 
     }
     public void joinGame (ChessGame.TeamColor playerColor, Integer gameID, String username)  throws Exception{
-        if (playerColor == null || gameID == null || username == null) {
+        GameData game = gameDataAccess.getGame(gameID);
+
+
+        if (playerColor == null || username == null) {
             throw new Exception("Error: bad request");
         }
-        if (gameDataAccess.getGame(gameID) == null) {
+        if (game == null) {
             throw new Exception("Error: unauthorized");
         }
-        if (gameDataAccess.getGame(gameID).whiteUsername() != "" && gameDataAccess.getGame(gameID).blackUsername() != "") {
+        if (playerColor == ChessGame.TeamColor.WHITE)  {
+            if (game.whiteUsername() != null && !game.whiteUsername().isEmpty()) {
+                throw new Exception("Error: already taken");
+            }
+        } else if (game.blackUsername() != null && !game.blackUsername().isEmpty()) {
             throw new Exception("Error: already taken");
         }
+
         gameDataAccess.joinGame(playerColor,gameID, username);
     }
 }

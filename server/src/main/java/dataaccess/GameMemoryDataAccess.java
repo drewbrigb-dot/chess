@@ -34,7 +34,7 @@ public class GameMemoryDataAccess implements GameDataAccess {
         }
 
         ChessGame chessGame = new ChessGame();
-        GameData game = new GameData(newGameID,"","",gameName,chessGame);
+        GameData game = new GameData(newGameID,null,null,gameName,chessGame);
 
         gameData.put(newGameID,game);
         return newGameID;
@@ -49,11 +49,20 @@ public class GameMemoryDataAccess implements GameDataAccess {
     @Override
     public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String newUsername) {
         GameData oldGame = gameData.get(gameID);
+        String whiteUsername = oldGame.whiteUsername();
+        String blackUsername = oldGame.blackUsername();
+
+       /* if (oldGame.whiteUsername().isEmpty()) {
+            whiteUsername = null;
+        }
+        if (oldGame.blackUsername().isEmpty()) {
+            blackUsername = null;
+        }*/
         GameData newGame;
         if (playerColor == ChessGame.TeamColor.BLACK) {
-            newGame = new GameData(gameID, oldGame.whiteUsername(), newUsername, oldGame.gameName(), oldGame.game());
+            newGame = new GameData(gameID, whiteUsername, newUsername, oldGame.gameName(), oldGame.game());
         }else {
-            newGame = new GameData(gameID, newUsername, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
+            newGame = new GameData(gameID, newUsername, blackUsername, oldGame.gameName(), oldGame.game());
         }
         gameData.remove(gameID);
         gameData.put(gameID,newGame);
