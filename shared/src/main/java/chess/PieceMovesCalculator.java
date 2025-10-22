@@ -82,23 +82,16 @@ public class PieceMovesCalculator {
                         ChessPosition positionNew = new ChessPosition(row, col);
                         if (row == 3) {
                             int rowSpecial = row + 1;
-                            pawnHelper2 (row, rowSpecial, col, board,positionNew,position);
+                            pawnHelper2(row, rowSpecial, col, board, positionNew, position);
                         }
                         int rowEqual = 8;
-                        pawnHelper( row, rowEqual, board,  positionNew,  position,  promoType);
+                        pawnHelper(row, rowEqual, board, positionNew, position, promoType);
                     } else {
                         ChessPosition positionNew = new ChessPosition(row, col);
 
                         if (board.getPiece(positionNew) != null && board.getPiece(positionNew).getTeamColor() != color) {
-                            if (row == 8) {
-                                for (PieceType type : promoType) {
-                                    ChessMove move = new ChessMove(position, positionNew, type);
-                                    moves.add(move);
-                                }
-                            } else {
-                                ChessMove move = new ChessMove(position, positionNew, null);
-                                moves.add(move);
-                            }
+                            int rowEqual = 8;
+                            pawnHelper3(row, rowEqual, position, positionNew, promoType);
                         }
                     }
                 }
@@ -114,23 +107,16 @@ public class PieceMovesCalculator {
                         ChessPosition positionNew = new ChessPosition(row, col);
                         if (row == 6) {
                             int rowSpecial = row - 1;
-                            pawnHelper2 (row, rowSpecial, col, board,positionNew,position);
+                            pawnHelper2(row, rowSpecial, col, board, positionNew, position);
                         }
                         int rowEqual = 1;
-                        pawnHelper(row,rowEqual , board, positionNew,  position, promoType);
+                        pawnHelper(row, rowEqual, board, positionNew, position, promoType);
                     } else {
                         ChessPosition positionNew = new ChessPosition(row, col);
 
                         if (board.getPiece(positionNew) != null && board.getPiece(positionNew).getTeamColor() != color) {
-                            if (row == 1) {
-                                for (PieceType type : promoType) {
-                                    ChessMove move = new ChessMove(position, positionNew, type);
-                                    moves.add(move);
-                                }
-                            } else {
-                                ChessMove move = new ChessMove(position, positionNew, null);
-                                moves.add(move);
-                            }
+                            int rowEqual = 1;
+                            pawnHelper3(row, rowEqual, position, positionNew, promoType);
                         }
 
                     }
@@ -142,7 +128,7 @@ public class PieceMovesCalculator {
             }
         }
     return moves;
-    }
+}
 
     public HashSet bishopMovesCalculator (ChessPosition position, ChessBoard board){
         int directions[][] = {{1,1},{-1,1},{-1,-1},{1,-1}};
@@ -225,4 +211,17 @@ public class PieceMovesCalculator {
             }
         }
     }
+
+    void pawnHelper3 (int row, int rowEqual, ChessPosition position, ChessPosition positionNew, ArrayList<PieceType> promoType) {
+        if (row == rowEqual) {
+            for (PieceType type : promoType) {
+                ChessMove move = new ChessMove(position, positionNew, type);
+                moves.add(move);
+            }
+        } else {
+            ChessMove move = new ChessMove(position, positionNew, null);
+            moves.add(move);
+        }
+    }
+
 }
