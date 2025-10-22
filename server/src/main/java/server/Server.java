@@ -11,6 +11,7 @@ import service.GameService;
 import service.UserService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 
@@ -96,14 +97,7 @@ public class Server {
             ctx.result("{}");
 
         }catch (Exception ex) {
-            if (ex.getMessage().equals("Error: unauthorized")) {
-                var msg = Map.of("message","Error: unauthorized");
-                ctx.status(401).result(serializer.toJson(msg));
-            }
-            else {
-                var msg = Map.of("message","Error: welp");
-                ctx.status(500).result(serializer.toJson(msg));
-            }
+            exceptionHelperTwoEx( ex,  ctx,  serializer);
         }
     }
 
@@ -119,19 +113,8 @@ public class Server {
             ctx.result(serializer.toJson(authData));
 
         }catch (Exception ex) {
-            if (ex.getMessage().equals("Error: already exists")) {
-                var msg = Map.of("message", "Error: username already taken");
-                ctx.status(403).result(serializer.toJson(msg));
-            }
-            else if (ex.getMessage().equals("Error: bad request")) {
-                var msg = Map.of("message","Error: bad request");
-                ctx.status(400).result(serializer.toJson(msg));
-            } else {
-                var msg = Map.of("message","Error: welp");
-                ctx.status(500).result(serializer.toJson(msg));
-            }
+            exceptionHelper(ex, ctx, serializer);
         }
-
     }
     private void createGame (Context ctx ) {
         var serializer = new Gson();
@@ -161,7 +144,6 @@ public class Server {
                 ctx.status(500).result(serializer.toJson(msg));
             }
         }
-
     }
 
     private void listGames(Context ctx) {
@@ -183,18 +165,12 @@ public class Server {
             ctx.result(serializer.toJson(listGamesResult));
 
         }catch (Exception ex) {
-            if (ex.getMessage().equals("Error: unauthorized")) {
-                var msg = Map.of("message", "Error: unauthorized");
-                ctx.status(401).result(serializer.toJson(msg));
-            } else {
-                var msg = Map.of("message","Error: welp");
-                ctx.status(500).result(serializer.toJson(msg));
-            }
+            exceptionHelperTwoEx ( ex,  ctx,  serializer);
         }
     }
 
     private void joinGame (Context ctx ) {
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try {
             String reqJson = ctx.body();
             String authToken = ctx.header("authorization");
@@ -233,6 +209,29 @@ public class Server {
             }
         }
 
+    }
+
+    public void exceptionHelper (Exception ex, Context ctx, Gson serializer){
+        if (ex.getMessage().equals("Error: already exists")) {
+            var msg = Map.of("message", "Error: username already taken");
+            ctx.status(403).result(serializer.toJson(msg));
+        }
+        else if (ex.getMessage().equals("Error: bad request")) {
+            var msg = Map.of("message","Error: bad request");
+            ctx.status(400).result(serializer.toJson(msg));
+        } else {
+            var msg = Map.of("message","Error: welp");
+            ctx.status(500).result(serializer.toJson(msg));
+        }
+    }
+    public void exceptionHelperTwoEx (Exception ex, Context ctx, Gson serializer){
+        if (ex.getMessage().equals("Error: unauthorized")) {
+            var msg = Map.of("message", "Error: unauthorized");
+            ctx.status(401).result(serializer.toJson(msg));
+        } else {
+            var msg = Map.of("message","Error: welp");
+            ctx.status(500).result(serializer.toJson(msg));
+        }
     }
 
 

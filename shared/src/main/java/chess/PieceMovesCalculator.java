@@ -169,29 +169,9 @@ public class PieceMovesCalculator {
 
     public HashSet rookMovesCalculator (ChessPosition position, ChessBoard board){
         int directions[][] = {{1,0},{0,1},{-1,0},{0,-1}};
-        ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
+        return bishopAndQueenHelper(board,position,directions);
 
-        for (int i =0; i <directions.length; i++) {
-            int row = position.getRow() + directions[i][0];
-            int col = position.getColumn() + directions[i][1];
 
-            while (row < 9 && row > 0 && col < 9 && col >0) {
-                ChessPosition positionNew = new ChessPosition(row,col);
-
-               if(addMoves(board,positionNew,position,color)) {
-                   break;
-               }
-
-                if (directions[i][0] > 0) {
-                    row++;
-                }else if (directions[i][0] < 0) {row--;}
-                if (directions[i][1] > 0) {
-                    col++;
-                }else if (directions[i][1] < 0) {col--;}
-            }
-        }
-
-        return moves;
     }
     private Boolean addMoves (ChessBoard board, ChessPosition positionNew, ChessPosition position, ChessGame.TeamColor color) {
         if (board.getPiece(positionNew) == null) {
@@ -252,7 +232,3 @@ public class PieceMovesCalculator {
         }
     }
 }
-
-
-
-
