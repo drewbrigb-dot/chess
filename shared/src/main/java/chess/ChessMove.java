@@ -59,7 +59,7 @@ public class ChessMove {
         }
         if (Objects.equals(startPosition, chessMove.startPosition)) {
             if (Objects.equals(endPosition, chessMove.endPosition)) {
-                if (promotionPiece == chessMove.promotionPiece) {
+                if (chessMove.promotionPiece == promotionPiece) {
                     return true;
                 }
             }

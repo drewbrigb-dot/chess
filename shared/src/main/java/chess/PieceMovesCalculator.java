@@ -81,7 +81,8 @@ public class PieceMovesCalculator {
                     if (directions[i][1] == 0) {
                         ChessPosition positionNew = new ChessPosition(row, col);
                         if (row == 3) {
-                            pawnHelper2 (row,col, board,positionNew,position);
+                            int rowSpecial = row + 1;
+                            pawnHelper2 (row, rowSpecial, col, board,positionNew,position);
                         }
                         int rowEqual = 8;
                         pawnHelper( row, rowEqual, board,  positionNew,  position,  promoType);
@@ -112,7 +113,8 @@ public class PieceMovesCalculator {
                     if (directions[i][1] == 0) {
                         ChessPosition positionNew = new ChessPosition(row, col);
                         if (row == 6) {
-                            pawnHelper2 (row,col, board,positionNew,position);
+                            int rowSpecial = row - 1;
+                            pawnHelper2 (row, rowSpecial, col, board,positionNew,position);
                         }
                         int rowEqual = 1;
                         pawnHelper(row,rowEqual , board, positionNew,  position, promoType);
@@ -212,11 +214,11 @@ public class PieceMovesCalculator {
         }
     }
 
-    void pawnHelper2 (int row, int col, ChessBoard board,ChessPosition positionNew, ChessPosition position) {
+    void pawnHelper2 (int row, int rowSpecial, int col, ChessBoard board,ChessPosition positionNew, ChessPosition position) {
         if (board.getPiece(positionNew) == null) {
             ChessMove move = new ChessMove(position, positionNew, null);
             moves.add(move);
-            ChessPosition positionNewSpecial = new ChessPosition(row + 1, col);
+            ChessPosition positionNewSpecial = new ChessPosition(rowSpecial, col);
             if (board.getPiece(positionNewSpecial) == null) {
                 move = new ChessMove(position, positionNewSpecial, null);
                 moves.add(move);
