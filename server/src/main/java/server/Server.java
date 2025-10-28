@@ -6,12 +6,10 @@ import model.*;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
-import org.eclipse.jetty.server.Authentication;
 import service.GameService;
 import service.UserService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 
@@ -24,7 +22,10 @@ public class Server {
     GameMemoryDataAccess gameDataAccess;
     AuthDataAccess authDataAccess;
 
-    public Server() {
+    public Server()throws DataAccessException {
+        var userDataAccessSQL = new SQLUserDataAccess();
+        var gameDataAccessSQL = new SQLGameDataAccess();
+        var authDataAccessSQL = new SQLAuthDataAccess();
         userDataAccess= new UserMemoryDataAccess();
         gameDataAccess = new GameMemoryDataAccess();
         authDataAccess = new AuthMemoryDataAccess();
