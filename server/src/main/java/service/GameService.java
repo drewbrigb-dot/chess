@@ -2,7 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDataAccess;
-import dataaccess.AuthMemoryDataAccess;
+//import dataaccess.AuthMemoryDataAccess;
 import dataaccess.GameDataAccess;
 import dataaccess.UserDataAccess;
 

@@ -11,6 +11,7 @@ public interface GameDataAccess  {
     ArrayList<GameData> listOfGames();
     void clearGame();
     void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username);
+    void createDatabase() throws Exception;
 
     //update Game??
 

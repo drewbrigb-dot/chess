@@ -1,9 +1,11 @@
 package dataaccess;
 
+import model.AuthData;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class SQLAuthDataAccess {
+public class SQLAuthDataAccess  implements AuthDataAccess{
     public SQLAuthDataAccess() throws DataAccessException {
         DatabaseManager.createDatabase();
     }
@@ -12,26 +14,48 @@ public class SQLAuthDataAccess {
     private final String[] createStatement = {
             """
             CREATE TABLE IF NOT EXISTS  AuthData (
-               id INT NOT NULL AUTO_INCREMENT,
               `username` VARCHAR(255) NOT NULL,
               `authToken` VARCHAR(255) NOT NULL,
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`authToken`)
             );
             """
     };
 
-    private void createDatabase() throws Exception {
+    public void createDatabase() throws Exception {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatement) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
-                    //what is execute update
                 }
             }
         } catch (SQLException ex ) {
-            //what is this line
+            throw new Exception("Unable to read data");
         }
     }
 
+    @Override
+    public void clearAuth() {
+
+    }
+
+    @Override
+    public void createAuth(AuthData authData) {
+
+    }
+
+    @Override
+    public AuthData getAuth(String authToken) {
+        return null;
+    }
+
+    @Override
+    public void deleteAuth(String authToken) {
+
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
 }

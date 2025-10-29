@@ -7,4 +7,5 @@ public interface UserDataAccess {
     UserData getUser(String username);
     boolean isEmpty();
     boolean validateUser(String username, String password);
+    void createDatabase() throws Exception;
 }

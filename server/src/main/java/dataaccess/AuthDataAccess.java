@@ -8,4 +8,5 @@ public interface AuthDataAccess {
     AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
     boolean isEmpty();
+    void createDatabase() throws Exception;
 }

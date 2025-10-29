@@ -1,3 +1,4 @@
+
 package dataaccess;
 
 import model.AuthData;
@@ -31,4 +32,10 @@ public class AuthMemoryDataAccess implements AuthDataAccess {
     public boolean isEmpty() {
         return usersAuth.isEmpty();
     }
+
+    @Override
+    public void createDatabase() throws Exception {
+        System.console().printf("You're not supposed to be here");
+    }
 }
+

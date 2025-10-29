@@ -8,7 +8,6 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import service.GameService;
 import service.UserService;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -18,29 +17,22 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
-    UserMemoryDataAccess userDataAccess;
-    GameMemoryDataAccess gameDataAccess;
+    UserDataAccess userDataAccess;
+    GameDataAccess gameDataAccess;
     AuthDataAccess authDataAccess;
 
     public Server()  {
+
         try {
-            var userDataAccessSQL = new SQLUserDataAccess();
+            userDataAccess = new SQLUserDataAccess();
+            gameDataAccess = new SQLGameDataAccess();
+            authDataAccess = new SQLAuthDataAccess();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("Failed to create SQL database. Memory db was used");
+            userDataAccess = new UserMemoryDataAccess();
+            gameDataAccess = new GameMemoryDataAccess();
+            authDataAccess = new AuthMemoryDataAccess();
         }
-        try {
-            var gameDataAccessSQL = new SQLGameDataAccess();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            var authDataAccessSQL = new SQLAuthDataAccess();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-        userDataAccess= new UserMemoryDataAccess();
-        gameDataAccess = new GameMemoryDataAccess();
-        authDataAccess = new AuthMemoryDataAccess();
 
         //instances of db classes?
         userService = new UserService(userDataAccess,authDataAccess);
