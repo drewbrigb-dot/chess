@@ -22,10 +22,22 @@ public class Server {
     GameMemoryDataAccess gameDataAccess;
     AuthDataAccess authDataAccess;
 
-    public Server()throws DataAccessException {
-        var userDataAccessSQL = new SQLUserDataAccess();
-        var gameDataAccessSQL = new SQLGameDataAccess();
-        var authDataAccessSQL = new SQLAuthDataAccess();
+    public Server()  {
+        try {
+            var userDataAccessSQL = new SQLUserDataAccess();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            var gameDataAccessSQL = new SQLGameDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            var authDataAccessSQL = new SQLAuthDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         userDataAccess= new UserMemoryDataAccess();
         gameDataAccess = new GameMemoryDataAccess();
         authDataAccess = new AuthMemoryDataAccess();

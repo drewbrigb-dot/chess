@@ -1,10 +1,17 @@
 package dataaccess;
 
+import com.google.gson.Gson;
+
 import model.UserData;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import model.*;
+
 public class SQLUserDataAccess implements UserDataAccess{
-    public SQLUserDataAccess() throws DataAccessException {
-        DatabaseManager.createDatabase();
+    public SQLUserDataAccess() throws Exception {
+        createDatabase();
+
     }
     @Override
     public void clear() {
@@ -13,6 +20,8 @@ public class SQLUserDataAccess implements UserDataAccess{
 
     @Override
     public void createUser(UserData user) {
+        var statement = "INSERT INTO UserData (username,email,password) VALUES (?,?,?)";
+        String json = new Gson().toJson(user);
 
     }
 
@@ -40,7 +49,24 @@ public class SQLUserDataAccess implements UserDataAccess{
               `username` VARCHAR(255) NOT NULL,
               `email` VARCHAR(255) NOT NULL,
               `password` VARCHAR(255) NOT NULL
+               PRIMARY KEY (`id`)
             );
             """
     };
+
+    private void createDatabase() throws Exception {
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatement) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                    //what is execute update
+                }
+            }
+        } catch (SQLException ex ) {
+            //what is this line
+            throw new Exception("Unable to read data");
+
+        }
+    }
 }
