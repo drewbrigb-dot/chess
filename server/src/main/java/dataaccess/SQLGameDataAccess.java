@@ -30,13 +30,12 @@ public class SQLGameDataAccess implements GameDataAccess{
     private final String[] createStatement = {
             """
             CREATE TABLE IF NOT EXISTS  UserData (
-               id INT NOT NULL AUTO_INCREMENT,
               `gameID` INT NOT NULL,
               `whiteUsername` VARCHAR(255),
               `blackUsername` VARCHAR(255),
               `gameName` VARCHAR(255) NOT NULL,
-               
-              PRIMARY KEY (`id`)
+               `game` TEXT,
+              PRIMARY KEY (`gameID`)
             );
             """
 

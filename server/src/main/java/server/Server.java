@@ -52,7 +52,11 @@ public class Server {
     }
 
     private void clear(Context ctx) {
-        userDataAccess.clear();
+        try {
+            userDataAccess.clear();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         gameDataAccess.clearGame();
         authDataAccess.clearAuth();
 

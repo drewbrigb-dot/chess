@@ -40,4 +40,9 @@ public class UserMemoryDataAccess implements UserDataAccess {
         }else {return false;}
 
     }
+
+    @Override
+    public void createDatabase() throws Exception {
+        System.console().printf("You're not supposed to be here");
+    }
 }

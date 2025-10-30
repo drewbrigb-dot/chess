@@ -62,4 +62,9 @@ public class GameMemoryDataAccess implements GameDataAccess {
         gameData.put(gameID,newGame);
 
     }
+
+    @Override
+    public void createDatabase() throws Exception {
+        System.console().printf("You're not supposed to be here");
+    }
 }
