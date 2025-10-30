@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class SQLAuthDataAccess  implements AuthDataAccess{
     public SQLAuthDataAccess() throws DataAccessException {
-        DatabaseManager.createDatabase();
+        createDatabase();
     }
 
 

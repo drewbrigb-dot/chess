@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class SQLGameDataAccess implements GameDataAccess{
 
     public SQLGameDataAccess() throws DataAccessException {
-        DatabaseManager.createDatabase();
+        createDatabase();
     }
 
 
@@ -86,14 +86,14 @@ public class SQLGameDataAccess implements GameDataAccess{
 
                     try (var preparedAddStatement = conn.prepareStatement
                             ("INSERT INTO GameData (gameID,whiteUsername,blackUsername,gameName,game) VALUES (?,?,?,?,?)")) {
-                        preparedStatement.setString(1, String.valueOf(gameID));
-                        preparedStatement.setString(2, "");
-                        preparedStatement.setString(3,"");
-                        preparedStatement.setString(4,gameName);
+                        preparedAddStatement.setString(1, String.valueOf(gameID));
+                        preparedAddStatement.setString(2, "");
+                        preparedAddStatement.setString(3,"");
+                        preparedAddStatement.setString(4,gameName);
                         ChessGame chessGame = new ChessGame();
                         String jsonChessGame = serializer.toJson(chessGame);
-                        preparedStatement.setString(5,jsonChessGame);
-                        preparedStatement.executeUpdate();
+                        preparedAddStatement.setString(5,jsonChessGame);
+                        preparedAddStatement.executeUpdate();
                         return gameID;
                     }
 
@@ -112,6 +112,7 @@ public class SQLGameDataAccess implements GameDataAccess{
 
     @Override
     public ArrayList<GameData> listOfGames() {
+
         return null;
     }
 

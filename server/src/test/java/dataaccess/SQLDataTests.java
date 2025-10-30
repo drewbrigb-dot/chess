@@ -127,4 +127,21 @@ public class SQLDataTests {
         assertEquals("ChessIsLame", gameService.gameDataAccess.getGame(gameID).gameName());
     }
 
+    @Test
+    void createInvalidGame() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        GameDataAccess dbGame = new SQLGameDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        Exception e = assertThrows(Exception.class, () -> gameService.createGame(authData.authToken(),null));
+        assertEquals("Error: bad request", e.getMessage());
+    }
 }
