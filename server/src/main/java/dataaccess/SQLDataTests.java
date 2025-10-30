@@ -44,5 +44,18 @@ public class SQLDataTests {
         assertEquals("No parameter can be null",e.getMessage());
 
     }
+    @Test
+    void login() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser,dbAuth);
+        userService.register(user);
+
+        AuthData authData = userService.login(user);
+        assertEquals("joe",authData.username());
+    }
 
 }

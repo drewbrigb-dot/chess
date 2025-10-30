@@ -67,14 +67,42 @@ public class SQLUserDataAccess implements UserDataAccess{
         return null;
     }
 
-    @Override
+    /*@Override
     public boolean isEmpty() {
-        return false;
-    }
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT * FROM UserData")) {
+                var result = preparedStatement.executeQuery();
+                if (result.next()) {
+                    String usrnme = result.getString("username");
+
+                    return new UserData(usrnme,email,password);
+                }
+
+
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }*/
 
     @Override
-    public boolean validateUser(String username, String password) {
-        return false;
+    public boolean validateUser(String username, String password) throws Exception {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT * FROM UserData WHERE username=?")) {
+                preparedStatement.setString(1, username);
+                ResultSet result = preparedStatement.executeQuery();
+                if (result.next()) {
+                    return true;
+                   /* String usrnme = result.getString("username");
+                    String email = result.getString("email");
+                    String psswrd = result.getString("password");*/
+
+                    //do I need to check for password?
+                }else {return false;}
+            }
+        }catch (Exception e) {
+            throw new Exception("What the freak happened");
+        }
     }
 
 

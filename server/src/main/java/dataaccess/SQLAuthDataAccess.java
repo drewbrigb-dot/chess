@@ -40,7 +40,16 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     }
 
     @Override
-    public void createAuth(AuthData authData) {
+    public void createAuth(AuthData authData) throws Exception {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (username,authToken) VALUES (?,?)")) {
+                preparedStatement.setString(1, authData.username());
+                preparedStatement.setString(2, authData.authToken());
+                preparedStatement.executeUpdate();
+            }
+        }catch (Exception e) {
+            throw new Exception("No parameter can be null");
+        }
 
     }
 
@@ -54,8 +63,8 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
 
     }
 
-    @Override
+    /*@Override
     public boolean isEmpty() {
         return false;
-    }
+    }*/
 }
