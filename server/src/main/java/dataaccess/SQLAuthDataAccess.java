@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SQLAuthDataAccess  implements AuthDataAccess{
@@ -15,7 +16,7 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
             """
             CREATE TABLE IF NOT EXISTS  AuthData (
               `username` VARCHAR(255) NOT NULL,
-              `authToken` VARCHAR(255) NOT NULL,
+              `authToken` VARCHAR(255) NULL,
               PRIMARY KEY (`authToken`)
             );
             """
@@ -36,7 +37,13 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
 
     @Override
     public void clearAuth() {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE AuthData")) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -54,13 +61,37 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
-        return null;
+    public AuthData getAuth(String authToken) throws Exception {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT * FROM AuthData WHERE authToken=?")) {
+                preparedStatement.setString(1, authToken);
+                ResultSet result = preparedStatement.executeQuery();
+                if (result.next()) {
+
+                    String usrnme = result.getString("username");
+                    String authTokenFinal = result.getString("authToken");
+                    AuthData authData = new AuthData(usrnme, authTokenFinal);
+                    return authData;
+                    //do I need to check for password?
+                }
+            } catch (Exception e) {
+                throw new Exception("What the freak happened");
+            }
+
+            return null;
+        }
     }
 
     @Override
     public void deleteAuth(String authToken) {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("UPDATE AuthData SET authToken = '' WHERE authToken=?")) {
+                preparedStatement.setString(1, authToken);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /*@Override
