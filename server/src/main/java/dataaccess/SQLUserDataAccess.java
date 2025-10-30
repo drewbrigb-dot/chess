@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import model.*;
+
+import org.mindrot.jbcrypt.BCrypt;
 import service.UserService;
 
 public class SQLUserDataAccess implements UserDataAccess{
@@ -31,11 +33,14 @@ public class SQLUserDataAccess implements UserDataAccess{
         /*var statement = "INSERT INTO UserData (username,email,password) VALUES (?,?,?)";
         String json = new Gson().toJson(user);*/
 
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+
+
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO UserData (username,email,password) VALUES (?,?,?)")) {
                 preparedStatement.setString(1, user.username());
                 preparedStatement.setString(2, user.email());
-                preparedStatement.setString(3, user.password());
+                preparedStatement.setString(3, hashedPassword);
                 preparedStatement.executeUpdate();
             }
         }catch (SQLException e) {
@@ -90,9 +95,12 @@ public class SQLUserDataAccess implements UserDataAccess{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM UserData WHERE username=?")) {
                 preparedStatement.setString(1, username);
+
                 ResultSet result = preparedStatement.executeQuery();
                 if (result.next()) {
-                    return true;
+                    String psswrd = result.getString("password");
+
+                    return BCrypt.checkpw(password, psswrd);
                    /* String usrnme = result.getString("username");
                     String email = result.getString("email");
                     String psswrd = result.getString("password");*/
@@ -131,4 +139,5 @@ public class SQLUserDataAccess implements UserDataAccess{
 
         }
     }
+
 }

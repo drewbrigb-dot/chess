@@ -165,8 +165,6 @@ public class SQLGameDataAccess implements GameDataAccess{
 
     }
 
-
-
     private void listOfGames (ArrayList<GameData>list, int rows) throws DataAccessException {
         var serializer = new Gson();
         for (int i = 1; i <= rows; i++) {
