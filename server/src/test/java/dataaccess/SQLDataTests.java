@@ -1,11 +1,14 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 import service.GameService;
 import service.UserService;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -144,4 +147,104 @@ public class SQLDataTests {
         Exception e = assertThrows(Exception.class, () -> gameService.createGame(authData.authToken(),null));
         assertEquals("Error: bad request", e.getMessage());
     }
+
+    @Test
+    void listGames() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        GameDataAccess dbGame = new SQLGameDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        gameService.createGame(authToken, "ChessIsStupid");
+
+        ArrayList<GameData> gameList = gameService.listOfGames(authToken);
+
+        assertEquals(dbGame.listOfGames(), gameList);
+
+    }
+
+    @Test
+    void listWithBadToken() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        GameDataAccess dbGame = new SQLGameDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        gameService.createGame(authToken, "ChessIsStupid");
+
+        String badAuthToken = UUID.randomUUID().toString();
+
+        Exception e = assertThrows(Exception.class, () -> gameService.listOfGames(badAuthToken));
+        assertEquals("Error: unauthorized", e.getMessage());
+
+    }
+    @Test
+    void joinGameSuccess() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        GameDataAccess dbGame = new SQLGameDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        Integer gameID = gameService.createGame(authToken, "ChessIsStupid");
+
+        gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,user.username());
+
+        assertEquals("joe",dbGame.getGame(gameID).whiteUsername());
+    }
+
+    @Test
+    void joinGameFailure() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        GameDataAccess dbGame = new SQLGameDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userBad = new UserData("tommy", "tommy@tom.com", "toomanyshawties");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        Integer gameID = gameService.createGame(authToken, "ChessIsStupid");
+
+        gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,user.username());
+
+        Exception e = assertThrows(Exception.class, () -> gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,"tommy"));
+        assertEquals("Error: already taken", e.getMessage());
+
+
+
+    }
+
 }

@@ -84,7 +84,7 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     @Override
     public void deleteAuth(String authToken) {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("UPDATE AuthData SET authToken = '' WHERE authToken=?")) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM AuthData WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 preparedStatement.executeUpdate();
             }

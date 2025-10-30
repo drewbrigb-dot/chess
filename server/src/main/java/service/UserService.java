@@ -55,7 +55,6 @@ public class UserService {
         if (authData.getAuth(authToken) == null) {
             throw new Exception("Error: unauthorized");
         }
-
         authData.deleteAuth(authToken);
         return true;
     }

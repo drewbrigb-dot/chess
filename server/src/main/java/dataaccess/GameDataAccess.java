@@ -9,7 +9,7 @@ import java.util.HashMap;
 public interface GameDataAccess  {
     GameData getGame (int gameID) throws DataAccessException;
     Integer createGame(String gameName) throws DataAccessException;
-    ArrayList<GameData> listOfGames();
+    ArrayList<GameData> listOfGames() throws DataAccessException;
     void clearGame() throws DataAccessException;
     void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) throws DataAccessException;
     void createDatabase() throws DataAccessException;

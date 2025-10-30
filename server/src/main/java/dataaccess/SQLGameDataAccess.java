@@ -45,7 +45,7 @@ public class SQLGameDataAccess implements GameDataAccess{
             """
 
 
-                    //int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game
+
     };
 
     @Override
@@ -111,9 +111,22 @@ public class SQLGameDataAccess implements GameDataAccess{
     }
 
     @Override
-    public ArrayList<GameData> listOfGames() {
+    public ArrayList<GameData> listOfGames() throws DataAccessException {
 
-        return null;
+        ArrayList<GameData> listGames = new ArrayList<>();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("Select Count(*) FROM GameData;")) {
+                ResultSet result = preparedStatement.executeQuery();
+                result.next();
+                int gameId = result.getInt(1);
+                listOfGames(listGames,gameId);
+            }
+        }catch (SQLException e) {
+            throw new DataAccessException("What the freak happened");
+        }
+
+        return listGames;
     }
 
     @Override
@@ -128,7 +141,58 @@ public class SQLGameDataAccess implements GameDataAccess{
     }
 
     @Override
-    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
+    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) throws DataAccessException {
+        String teamColor;
+        String statement;
+        if (playerColor == ChessGame.TeamColor.BLACK) {
+            teamColor = "blackUsername";
+            statement = "UPDATE GameData SET blackUsername=? WHERE gameID=?";
+        }else {
+            teamColor = "whiteUsername";
+            statement = "UPDATE GameData SET whiteUsername=? WHERE gameID=?";
+        }
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2,String.valueOf(gameID));
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("da freak");
+        }
+
+
+    }
+
+
+
+    private void listOfGames (ArrayList<GameData>list, int rows) throws DataAccessException {
+        var serializer = new Gson();
+        for (int i = 1; i <= rows; i++) {
+            try (var conn = DatabaseManager.getConnection()) {
+                try (var preparedStatement = conn.prepareStatement("SELECT * FROM GameData WHERE gameID = ?")) {
+                    preparedStatement.setString(1, String.valueOf(i));
+                    ResultSet result = preparedStatement.executeQuery();
+                    result.next();
+                    int gameId = result.getInt("gameID");
+                    String whiteUsername = result.getString("whiteUsername");
+                    String blackUsername = result.getString("blackUsername");
+                    String gameName = result.getString("gameName");
+                    String chessGame = result.getString("game");
+
+                    ChessGame chessGameData = serializer.fromJson(chessGame, ChessGame.class);
+                    GameData gameData = new GameData(gameId,whiteUsername,blackUsername,gameName,chessGameData);
+                    list.add(gameData);
+                    //int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game
+                }
+            }catch (SQLException e) {
+                throw new DataAccessException("What the freak happened");
+            }
+
+        }
+
+
 
     }
 }
