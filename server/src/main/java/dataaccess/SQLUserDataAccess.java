@@ -24,7 +24,7 @@ public class SQLUserDataAccess implements UserDataAccess{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 

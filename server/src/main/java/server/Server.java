@@ -54,19 +54,16 @@ public class Server {
     }
 
     private void clear(Context ctx) {
+        var serializer = new Gson();
         try {
             userDataAccess.clear();
             gameDataAccess.clearGame();
             authDataAccess.clearAuth();
-        } catch (DataAccessException e) {
-            System.console().printf("Exception was thrown");
+            ctx.status(200);
+            ctx.result("{}");
+        } catch (DataAccessException ex) {
+            exceptionHelper(ex,ctx,serializer);
         }
-
-
-
-        ctx.status(200);
-        ctx.result("{}");
-
     }
 
     private void login (Context ctx ) {
