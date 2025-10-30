@@ -34,7 +34,7 @@ public class AuthMemoryDataAccess implements AuthDataAccess {
     }*/
 
     @Override
-    public void createDatabase() throws Exception {
+    public void createDatabase() throws DataAccessException {
         System.console().printf("You're not supposed to be here");
     }
 }

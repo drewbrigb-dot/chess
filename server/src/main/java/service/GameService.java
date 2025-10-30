@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class GameService {
-    GameDataAccess gameDataAccess;
+    public GameDataAccess gameDataAccess;
     AuthDataAccess authDataAccess;
     public GameService (GameDataAccess gameDAO, AuthDataAccess authDAO) {
         gameDataAccess = gameDAO;
@@ -30,7 +30,7 @@ public class GameService {
             throw new Exception("Error: unauthorized");
         }
 
-        Integer gameID = gameDataAccess.createGame(authToken,gameName);
+        Integer gameID = gameDataAccess.createGame(gameName);
 
         return gameID;
 

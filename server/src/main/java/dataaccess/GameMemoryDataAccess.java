@@ -22,7 +22,7 @@ public class GameMemoryDataAccess implements GameDataAccess {
     }
 
     @Override
-    public Integer createGame(String authToken, String gameName) {
+    public Integer createGame(String gameName) {
 
         int newGameID;
 
@@ -64,7 +64,7 @@ public class GameMemoryDataAccess implements GameDataAccess {
     }
 
     @Override
-    public void createDatabase() throws Exception {
+    public void createDatabase() throws DataAccessException {
         System.console().printf("You're not supposed to be here");
     }
 }

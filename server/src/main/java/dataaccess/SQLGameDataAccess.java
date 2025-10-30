@@ -1,20 +1,25 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLGameDataAccess implements GameDataAccess{
+
     public SQLGameDataAccess() throws DataAccessException {
         DatabaseManager.createDatabase();
     }
 
 
-    public void createDatabase() throws Exception {
+
+    public void createDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatement) {
@@ -23,13 +28,13 @@ public class SQLGameDataAccess implements GameDataAccess{
                 }
             }
         } catch (SQLException ex ) {
-            throw new Exception("Unable to read data");
+            throw new DataAccessException("Unable to read data");
         }
     }
     //make create tables function
     private final String[] createStatement = {
             """
-            CREATE TABLE IF NOT EXISTS  UserData (
+            CREATE TABLE IF NOT EXISTS  GameData (
               `gameID` INT NOT NULL,
               `whiteUsername` VARCHAR(255),
               `blackUsername` VARCHAR(255),
@@ -44,12 +49,64 @@ public class SQLGameDataAccess implements GameDataAccess{
     };
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException{
+        var serializer = new Gson();
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT * FROM GameData WHERE gameID=?")) {
+                preparedStatement.setString(1, String.valueOf(gameID));
+                ResultSet result = preparedStatement.executeQuery();
+                if (result.next()) {
+                    int gameId = result.getInt("gameID");
+                    String whiteUsername = result.getString("whiteUsername");
+                    String blackUsername = result.getString("blackUsername");
+                    String gameName = result.getString("gameName");
+                    String chess = result.getString("game");
+                    ChessGame chessGame = serializer.fromJson(chess, ChessGame.class);
+                    GameData gameData = new GameData(gameId,whiteUsername,blackUsername,gameName,chessGame);
+                    return gameData;
+                    //do I need to check for password?
+                }
+            }
+        }
+        catch (SQLException e) {
+            throw new DataAccessException("What the freak happened");
+        }
         return null;
     }
 
     @Override
-    public Integer createGame(String authToken, String gameName) {
+    public Integer createGame(String gameName) throws DataAccessException {
+        var serializer = new Gson();
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("Select Count(*) FROM GameData;")) {
+                ResultSet result = preparedStatement.executeQuery();
+                if (result.next()) {
+                    int rows = result.getInt(1);
+                    int gameID = rows+1;
+
+                    try (var preparedAddStatement = conn.prepareStatement
+                            ("INSERT INTO GameData (gameID,whiteUsername,blackUsername,gameName,game) VALUES (?,?,?,?,?)")) {
+                        preparedStatement.setString(1, String.valueOf(gameID));
+                        preparedStatement.setString(2, "");
+                        preparedStatement.setString(3,"");
+                        preparedStatement.setString(4,gameName);
+                        ChessGame chessGame = new ChessGame();
+                        String jsonChessGame = serializer.toJson(chessGame);
+                        preparedStatement.setString(5,jsonChessGame);
+                        preparedStatement.executeUpdate();
+                        return gameID;
+                    }
+
+
+                    //do I need to check for password?
+                }
+            }
+        }
+        catch (SQLException e) {
+            throw new DataAccessException("What the freak happened");
+        }
+
+
         return 0;
     }
 
@@ -59,8 +116,14 @@ public class SQLGameDataAccess implements GameDataAccess{
     }
 
     @Override
-    public void clearGame() {
-
+    public void clearGame() throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE GameData")) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("da freak");
+        }
     }
 
     @Override

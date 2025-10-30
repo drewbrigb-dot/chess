@@ -22,7 +22,7 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
             """
     };
 
-    public void createDatabase() throws Exception {
+    public void createDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatement) {
@@ -31,7 +31,7 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
                 }
             }
         } catch (SQLException ex ) {
-            throw new Exception("Unable to read data");
+            throw new DataAccessException("Unable to read data");
         }
     }
 
@@ -47,21 +47,21 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     }
 
     @Override
-    public void createAuth(AuthData authData) throws Exception {
+    public void createAuth(AuthData authData) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO AuthData (username,authToken) VALUES (?,?)")) {
                 preparedStatement.setString(1, authData.username());
                 preparedStatement.setString(2, authData.authToken());
                 preparedStatement.executeUpdate();
             }
-        }catch (Exception e) {
-            throw new Exception("No parameter can be null");
+        }catch (SQLException e) {
+            throw new DataAccessException("No parameter can be null");
         }
 
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws Exception {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM AuthData WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
@@ -74,11 +74,10 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
                     return authData;
                     //do I need to check for password?
                 }
-            } catch (Exception e) {
-                throw new Exception("What the freak happened");
             }
-
             return null;
+        }catch (SQLException e) {
+            throw new DataAccessException("What the freak happened");
         }
     }
 

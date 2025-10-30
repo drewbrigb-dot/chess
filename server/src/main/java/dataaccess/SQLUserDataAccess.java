@@ -16,7 +16,7 @@ public class SQLUserDataAccess implements UserDataAccess{
 
     }
     @Override
-    public void clear() throws Exception{
+    public void clear() throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE UserData")) {
                 preparedStatement.executeUpdate();
@@ -27,7 +27,7 @@ public class SQLUserDataAccess implements UserDataAccess{
     }
 
     @Override
-    public void createUser(UserData user) throws Exception{
+    public void createUser(UserData user) throws DataAccessException{
         /*var statement = "INSERT INTO UserData (username,email,password) VALUES (?,?,?)";
         String json = new Gson().toJson(user);*/
 
@@ -38,13 +38,13 @@ public class SQLUserDataAccess implements UserDataAccess{
                 preparedStatement.setString(3, user.password());
                 preparedStatement.executeUpdate();
             }
-        }catch (Exception e) {
-            throw new Exception("No parameter can be null");
+        }catch (SQLException e) {
+            throw new DataAccessException("No parameter can be null");
         }
     }
 
     @Override
-    public UserData getUser(String username) throws Exception {
+    public UserData getUser(String username) throws DataAccessException {
 
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM UserData WHERE username=?")) {
@@ -60,8 +60,8 @@ public class SQLUserDataAccess implements UserDataAccess{
 
 
             }
-    }catch (Exception e) {
-            throw new Exception("User Data not found");
+    }catch (SQLException e) {
+            throw new DataAccessException("User Data not found");
         }
 
         return null;
@@ -86,7 +86,7 @@ public class SQLUserDataAccess implements UserDataAccess{
     }*/
 
     @Override
-    public boolean validateUser(String username, String password) throws Exception {
+    public boolean validateUser(String username, String password) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM UserData WHERE username=?")) {
                 preparedStatement.setString(1, username);
@@ -100,8 +100,8 @@ public class SQLUserDataAccess implements UserDataAccess{
                     //do I need to check for password?
                 }else {return false;}
             }
-        }catch (Exception e) {
-            throw new Exception("What the freak happened");
+        }catch (SQLException e) {
+            throw new DataAccessException("What the freak happened");
         }
     }
 
@@ -118,7 +118,7 @@ public class SQLUserDataAccess implements UserDataAccess{
             """
     };
 
-    public void createDatabase() throws Exception {
+    public void createDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatement) {
@@ -127,7 +127,7 @@ public class SQLUserDataAccess implements UserDataAccess{
                 }
             }
         } catch (SQLException ex ) {
-            throw new Exception("Unable to read data");
+            throw new DataAccessException("Unable to read data");
 
         }
     }

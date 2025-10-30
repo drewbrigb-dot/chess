@@ -8,6 +8,8 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import service.GameService;
 import service.UserService;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -54,11 +56,13 @@ public class Server {
     private void clear(Context ctx) {
         try {
             userDataAccess.clear();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            gameDataAccess.clearGame();
+            authDataAccess.clearAuth();
+        } catch (DataAccessException e) {
+            System.console().printf("Exception was thrown");
         }
-        gameDataAccess.clearGame();
-        authDataAccess.clearAuth();
+
+
 
         ctx.status(200);
         ctx.result("{}");

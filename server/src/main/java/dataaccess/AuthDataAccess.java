@@ -4,9 +4,9 @@ import model.*;
 
 public interface AuthDataAccess {
     void clearAuth();
-    void createAuth(AuthData authData) throws Exception;
-    AuthData getAuth(String authToken) throws Exception;
-    void deleteAuth(String authToken);
+    void createAuth(AuthData authData) throws DataAccessException;
+    AuthData getAuth(String authToken) throws DataAccessException;
+    void deleteAuth(String authToken) throws DataAccessException;
     //boolean isEmpty();
-    void createDatabase() throws Exception;
+    void createDatabase() throws DataAccessException;
 }

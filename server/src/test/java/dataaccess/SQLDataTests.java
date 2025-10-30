@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
+import service.GameService;
 import service.UserService;
 
 import java.util.UUID;
@@ -105,6 +106,25 @@ public class SQLDataTests {
         Exception e = assertThrows(Exception.class, () -> userService.logout(randAuthToken)) ;
         assertEquals("Error: unauthorized",e.getMessage());
 
+    }
+
+    @Test
+    void createGame() throws Exception {
+        UserDataAccess dbUser = new SQLUserDataAccess();
+        AuthDataAccess dbAuth = new SQLAuthDataAccess();
+        GameDataAccess dbGame = new SQLGameDataAccess();
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        int gameID = gameService.createGame(authData.authToken(),"ChessIsLame");
+
+        assertEquals("ChessIsLame", gameService.gameDataAccess.getGame(gameID).gameName());
     }
 
 }
