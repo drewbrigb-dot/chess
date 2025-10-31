@@ -39,12 +39,18 @@ public class SQLDataTests {
     }
     @Test
     public void createGameDatabase() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
         SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
         assertDoesNotThrow(sqlGameDataAccess::createDatabase);
     }
 
     @Test
     void createUser() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
         sqlUserDataAccess.createUser(user);
@@ -54,6 +60,9 @@ public class SQLDataTests {
 
     @Test
     void createBadUser() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         var user = new UserData(null, "j@j.com", "toomanysecrets");
 
@@ -64,6 +73,9 @@ public class SQLDataTests {
 
     @Test
     void getUser() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
         sqlUserDataAccess.createUser(user);
@@ -72,6 +84,9 @@ public class SQLDataTests {
 
     @Test
     void getBadUser() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
         String badPassword = "peepee";
