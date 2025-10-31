@@ -9,7 +9,6 @@ import io.javalin.http.Context;
 import service.GameService;
 import service.UserService;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 

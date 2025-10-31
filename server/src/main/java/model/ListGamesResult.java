@@ -1,4 +1,6 @@
-package dataaccess;
+package model;
+
+import dataaccess.GameInfo;
 
 import java.util.ArrayList;
 
