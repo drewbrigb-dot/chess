@@ -24,16 +24,8 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     };
 
     public void createDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatement) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex ) {
-            throw new DataAccessException("Unable to read data");
-        }
+        CreateDatabase userData = new CreateDatabase(createStatement);
+        userData.executeDatabase();
     }
 
     @Override
@@ -93,9 +85,4 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
             throw new DataAccessException(e.getMessage());
         }
     }
-
-    /*@Override
-    public boolean isEmpty() {
-        return false;
-    }*/
 }

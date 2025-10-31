@@ -27,9 +27,6 @@ public class SQLUserDataAccess implements UserDataAccess{
 
     @Override
     public void createUser(UserData user) throws DataAccessException{
-        /*var statement = "INSERT INTO UserData (username,email,password) VALUES (?,?,?)";
-        String json = new Gson().toJson(user);*/
-
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
 
 
@@ -69,24 +66,6 @@ public class SQLUserDataAccess implements UserDataAccess{
         return null;
     }
 
-    /*@Override
-    public boolean isEmpty() {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT * FROM UserData")) {
-                var result = preparedStatement.executeQuery();
-                if (result.next()) {
-                    String usrnme = result.getString("username");
-
-                    return new UserData(usrnme,email,password);
-                }
-
-
-            }
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
     @Override
     public boolean validateUser(String username, String password) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -98,11 +77,6 @@ public class SQLUserDataAccess implements UserDataAccess{
                     String psswrd = result.getString("password");
 
                     return BCrypt.checkpw(password, psswrd);
-                   /* String usrnme = result.getString("username");
-                    String email = result.getString("email");
-                    String psswrd = result.getString("password");*/
-
-                    //do I need to check for password?
                 }else {return false;}
             }
         }catch (SQLException e) {
@@ -124,17 +98,8 @@ public class SQLUserDataAccess implements UserDataAccess{
     };
 
     public void createDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatement) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex ) {
-            throw new DataAccessException("Unable to read data");
-
-        }
+        CreateDatabase userData = new CreateDatabase(createStatement);
+        userData.executeDatabase();
     }
 
 }

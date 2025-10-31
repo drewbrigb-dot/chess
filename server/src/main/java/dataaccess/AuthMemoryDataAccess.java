@@ -29,10 +29,6 @@ public class AuthMemoryDataAccess implements AuthDataAccess {
         usersAuth.remove(authToken);
     }
 
-   /* @Override
-    public boolean isEmpty() {
-        return usersAuth.isEmpty();
-    }*/
 
     @Override
     public void createDatabase() throws DataAccessException {

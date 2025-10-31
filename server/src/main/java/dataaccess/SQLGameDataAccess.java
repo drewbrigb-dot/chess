@@ -19,17 +19,10 @@ public class SQLGameDataAccess implements GameDataAccess{
 
 
     public void createDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatement) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex ) {
-            throw new DataAccessException("Unable to read data");
-        }
+        CreateDatabase userData = new CreateDatabase(createStatement);
+        userData.executeDatabase();
     }
+
     //make create tables function
     private final String[] createStatement = {
             """
