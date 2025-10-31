@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import org.junit.jupiter.api.function.Executable;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -36,13 +37,13 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     }
 
     @Override
-    public void clearAuth() {
+    public void clearAuth() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE AuthData")) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -82,14 +83,14 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     }
 
     @Override
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("DELETE FROM AuthData WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 

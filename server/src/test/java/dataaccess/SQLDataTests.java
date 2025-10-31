@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import service.GameService;
 import service.UserService;
 
@@ -14,6 +15,17 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLDataTests {
+
+    UserDataAccess dbUser;
+    AuthDataAccess dbAuth;
+    GameDataAccess dbGame;
+
+    public SQLDataTests() throws DataAccessException {
+        dbUser = new SQLUserDataAccess();
+        dbAuth = new SQLAuthDataAccess();
+        dbGame = new SQLGameDataAccess();
+    }
+
     @Test
     public void createUserDatabase() throws Exception {
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
@@ -48,12 +60,46 @@ public class SQLDataTests {
 
         Exception e = assertThrows(Exception.class, () -> sqlUserDataAccess.createUser(user)) ;
         assertEquals("No parameter can be null",e.getMessage());
-
     }
+
+    @Test
+    void getUser() throws Exception {
+        SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        sqlUserDataAccess.createUser(user);
+        assertTrue(BCrypt.checkpw(user.password(), sqlUserDataAccess.getUser(user.username()).password()));
+    }
+
+    @Test
+    void getBadUser() throws Exception {
+        SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        String badPassword = "peepee";
+        sqlUserDataAccess.createUser(user);
+        assertFalse(BCrypt.checkpw(badPassword, sqlUserDataAccess.getUser(user.username()).password()));
+    }
+
+    @Test
+    void validateUser()throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        dbUser.createUser(user);
+        assertTrue(dbUser.validateUser(user.username(),user.password()));
+    }
+
+    @Test
+    void validateBadUser()throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        dbUser.createUser(user);
+        String badUsername = "poop";
+        assertFalse(dbUser.validateUser(badUsername,user.password()));
+    }
+
     @Test
     void login() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
@@ -66,8 +112,6 @@ public class SQLDataTests {
 
     @Test
     void loginWrongUsername() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
@@ -81,8 +125,6 @@ public class SQLDataTests {
 
     @Test
     void logout() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
@@ -96,8 +138,6 @@ public class SQLDataTests {
 
     @Test
     void logoutInvalidToken() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
@@ -113,9 +153,6 @@ public class SQLDataTests {
 
     @Test
     void createGame() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
-        GameDataAccess dbGame = new SQLGameDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         dbGame.clearGame();
@@ -132,9 +169,6 @@ public class SQLDataTests {
 
     @Test
     void createInvalidGame() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
-        GameDataAccess dbGame = new SQLGameDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         dbGame.clearGame();
@@ -150,9 +184,6 @@ public class SQLDataTests {
 
     @Test
     void listGames() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
-        GameDataAccess dbGame = new SQLGameDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         dbGame.clearGame();
@@ -174,9 +205,6 @@ public class SQLDataTests {
 
     @Test
     void listWithBadToken() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
-        GameDataAccess dbGame = new SQLGameDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         dbGame.clearGame();
@@ -198,9 +226,6 @@ public class SQLDataTests {
     }
     @Test
     void joinGameSuccess() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
-        GameDataAccess dbGame = new SQLGameDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         dbGame.clearGame();
@@ -221,9 +246,6 @@ public class SQLDataTests {
 
     @Test
     void joinGameFailure() throws Exception {
-        UserDataAccess dbUser = new SQLUserDataAccess();
-        AuthDataAccess dbAuth = new SQLAuthDataAccess();
-        GameDataAccess dbGame = new SQLGameDataAccess();
         dbUser.clear();
         dbAuth.clearAuth();
         dbGame.clearGame();
@@ -243,8 +265,116 @@ public class SQLDataTests {
         Exception e = assertThrows(Exception.class, () -> gameService.joinGame(ChessGame.TeamColor.WHITE,gameID,"tommy"));
         assertEquals("Error: already taken", e.getMessage());
 
+    }
 
+    @Test
+    void getGame() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userBad = new UserData("tommy", "tommy@tom.com", "toomanyshawties");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+
+        String authToken = authData.authToken();
+
+        Integer gameID = gameService.createGame(authToken, "ChessIsStupid");
+
+        assertEquals("ChessIsStupid",dbGame.getGame(gameID).gameName());
+    }
+
+     @Test
+    void clear() throws Exception {
+        var user = new UserData("", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        userService.register(user);
+        assertDoesNotThrow(()->dbUser.clear());
+        assertDoesNotThrow(()->dbAuth.clearAuth());
+        assertDoesNotThrow(()->dbGame.clearGame());
 
     }
+
+    @Test
+    void createAuth() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        AuthData userAuth = new AuthData(user.username(),UUID.randomUUID().toString());
+        assertDoesNotThrow(()->dbAuth.createAuth(userAuth));
+    }
+
+    @Test
+    void createBadAuth() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData(null, "j@j.com", "toomanysecrets");
+        AuthData userAuth = new AuthData(user.username(),UUID.randomUUID().toString());
+        assertThrows(DataAccessException.class,()->dbAuth.createAuth(userAuth));
+    }
+
+    @Test
+    void getAuth() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        AuthData authData = userService.register(user);
+        assertEquals(authData,dbAuth.getAuth(authData.authToken()));
+    }
+
+    @Test
+    void getBadAuth() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var badUser = new UserData("poo","poo@gmail.com","poopoopeepee");
+        var userService = new UserService(dbUser, dbAuth);
+        AuthData authData = userService.register(user);
+        AuthData authDataBad = userService.register(badUser);
+        assertNotEquals(authDataBad,dbAuth.getAuth(authData.authToken()));
+    }
+
+    @Test
+    void deleteAuth() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        AuthData authData = userService.register(user);
+        dbAuth.deleteAuth(authData.authToken());
+        assertNull(dbAuth.getAuth(authData.authToken()));
+    }
+
+    @Test
+    void deleteBadAuth() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userService = new UserService(dbUser, dbAuth);
+        AuthData authData = userService.register(user);
+        assertDoesNotThrow(() ->dbAuth.deleteAuth(null));
+
+    }
+
+
+
+
+
+
 
 }

@@ -2,9 +2,9 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -14,6 +14,7 @@ public class GameMemoryDataAccess implements GameDataAccess {
     @Override
     public void clearGame() {
         gameData.clear();
+
     }
 
     @Override

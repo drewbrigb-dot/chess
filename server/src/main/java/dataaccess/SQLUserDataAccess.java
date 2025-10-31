@@ -1,19 +1,16 @@
 package dataaccess;
 
-import com.google.gson.Gson;
-
 import model.UserData;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import model.*;
 
+import org.junit.jupiter.api.function.Executable;
 import org.mindrot.jbcrypt.BCrypt;
-import service.UserService;
 
 public class SQLUserDataAccess implements UserDataAccess{
-    public SQLUserDataAccess() throws Exception {
+    public SQLUserDataAccess() throws DataAccessException {
         createDatabase();
 
     }
