@@ -115,10 +115,10 @@ public class SQLUserDataAccess implements UserDataAccess{
     private final String[] createStatement = {
             """
             CREATE TABLE IF NOT EXISTS  UserData (
-              `username` VARCHAR(255) NOT NULL,
-              `email` VARCHAR(255) NOT NULL,
-              `password` VARCHAR(255) NOT NULL,
-               PRIMARY KEY (`username`)
+              username VARCHAR(255) NOT NULL,
+              email VARCHAR(255) NOT NULL,
+              password VARCHAR(255) NOT NULL,
+              PRIMARY KEY (username)
             );
             """
     };

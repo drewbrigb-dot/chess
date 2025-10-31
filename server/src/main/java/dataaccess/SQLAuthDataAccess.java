@@ -16,9 +16,9 @@ public class SQLAuthDataAccess  implements AuthDataAccess{
     private final String[] createStatement = {
             """
             CREATE TABLE IF NOT EXISTS  AuthData (
-              `username` VARCHAR(255) NOT NULL,
-              `authToken` VARCHAR(255) NULL,
-              PRIMARY KEY (`authToken`)
+              username VARCHAR(255) NOT NULL,
+              authToken VARCHAR(255) NOT NULL,
+              PRIMARY KEY (authToken)
             );
             """
     };
