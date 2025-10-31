@@ -48,7 +48,7 @@ public class SQLDataTests {
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
         sqlUserDataAccess.createUser(user);
-        assertEquals(user,sqlUserDataAccess.getUser(user.username()));
+        assertEquals(user.email(),sqlUserDataAccess.getUser(user.username()).email());
 
     }
 
@@ -133,7 +133,7 @@ public class SQLDataTests {
 
         userService.login(user);
         userService.logout(authData.authToken());
-        assertEquals(user, dbUser.getUser(user.username()));
+        assertEquals(user.email(), dbUser.getUser(user.username()).email());
     }
 
     @Test

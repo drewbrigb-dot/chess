@@ -86,8 +86,8 @@ public class SQLGameDataAccess implements GameDataAccess{
                     try (var preparedAddStatement = conn.prepareStatement
                             ("INSERT INTO GameData (gameID,whiteUsername,blackUsername,gameName,game) VALUES (?,?,?,?,?)")) {
                         preparedAddStatement.setString(1, String.valueOf(gameID));
-                        preparedAddStatement.setString(2, "");
-                        preparedAddStatement.setString(3,"");
+                        preparedAddStatement.setString(2, null);
+                        preparedAddStatement.setString(3,null);
                         preparedAddStatement.setString(4,gameName);
                         ChessGame chessGame = new ChessGame();
                         String jsonChessGame = serializer.toJson(chessGame);
