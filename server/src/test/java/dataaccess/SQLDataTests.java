@@ -286,6 +286,30 @@ public class SQLDataTests {
         assertEquals("ChessIsStupid",dbGame.getGame(gameID).gameName());
     }
 
+    @Test
+    void getBadGame() throws Exception {
+        dbUser.clear();
+        dbAuth.clearAuth();
+        dbGame.clearGame();
+
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var userBad = new UserData("tommy", "tommy@tom.com", "toomanyshawties");
+        var userService = new UserService(dbUser, dbAuth);
+        GameService gameService = new GameService(dbGame,dbAuth);
+        AuthData authData = userService.register(user);
+        AuthData authBadData = userService.register(userBad);
+
+        String authToken = authData.authToken();
+        String authTokenBad = authBadData.authToken();
+
+        Integer gameID = gameService.createGame(authToken, "ChessIsStupid");
+        Integer gameBadID = gameService.createGame(authTokenBad, "ChessIsBad");
+
+        assertNotEquals("ChessIsBad",dbGame.getGame(gameID).gameName());
+    }
+
+
+
      @Test
     void clear() throws Exception {
         var user = new UserData("", "j@j.com", "toomanysecrets");
