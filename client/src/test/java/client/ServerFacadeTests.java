@@ -1,3 +1,4 @@
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -43,5 +44,32 @@ public class ServerFacadeTests {
         Exception e = assertThrows(Exception.class, () -> facade.register(userData)) ;
         assertEquals("Error: No parameter can be null",e.getMessage());
     }
+
+    @Test
+    public void login() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        facade.register(userData);
+        var authData = facade.login(userData);
+        assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    public void loginBad() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        Exception e = assertThrows(Exception.class, () -> facade.login(userData)) ;
+        assertEquals("Error: unauthorized",e.getMessage());
+    }
+
+    @Test
+    public void logout() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        assertDoesNotThrow(() -> facade.logout(authData.authToken()));
+    }
+
+    @Test
+
+
+
 
 }

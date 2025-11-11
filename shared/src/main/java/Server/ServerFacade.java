@@ -27,9 +27,34 @@ public class ServerFacade {
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
+
+    public AuthData login (UserData userData) throws Exception {
+        var request = buildRequest("Post","/session",userData);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
+    }
+
+    public void logout (String authToken) throws Exception {
+        HttpRequest request = buildRequestLogout("Delete","/session",null,"authorization",authToken);
+
+        var response = sendRequest(request);
+
+        handleResponse(response, null);
+    }
+
+
     public void clear()throws Exception {
         var request = buildRequest("DELETE", "/db", null);
         sendRequest(request);
+    }
+
+    private HttpRequest buildRequestLogout (String method, String path, Object body, String headerName, String headerValue) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path))
+                .header(headerName,headerValue)
+                .method(method,makeRequestBody(body));
+
+        return request.build();
     }
 
     private HttpRequest buildRequest (String method, String path, Object body) {
