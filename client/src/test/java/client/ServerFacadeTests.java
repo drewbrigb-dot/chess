@@ -68,6 +68,12 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void logoutBad() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        facade.register(userData);
+        Exception e = assertThrows(Exception.class, () -> facade.logout("poop&pee")) ;
+        assertEquals("Error: unauthorized",e.getMessage());
+    }
 
 
 
