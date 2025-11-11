@@ -1,6 +1,8 @@
 package Server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import model.AuthData;
 import model.UserData;
 
@@ -24,6 +26,10 @@ public class ServerFacade {
         var request = buildRequest("Post","/user",userData);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
+    }
+    public void clear()throws Exception {
+        var request = buildRequest("DELETE", "/db", null);
+        sendRequest(request);
     }
 
     private HttpRequest buildRequest (String method, String path, Object body) {
@@ -50,12 +56,16 @@ public class ServerFacade {
     }
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws Exception {
         var status = response.statusCode();
-        if (status == 200) {
+        if (status != 200) {
             var body = response.body();
             if (body != null) {
                 //throw something but idk what
+                JsonObject obj = JsonParser.parseString(body).getAsJsonObject();
+                String errorMessage = obj.get("message").getAsString();
+                throw new Exception(errorMessage);
             }
             //throw some exception about failure?
+            throw new Exception("other failure" + status);
         }
         if(responseClass != null) {
             return new Gson().fromJson(response.body(),responseClass);

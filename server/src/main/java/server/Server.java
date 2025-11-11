@@ -120,7 +120,7 @@ public class Server {
                 var msg = Map.of("message","Error: bad request");
                 ctx.status(400).result(serializer.toJson(msg));
             } else {
-                var msg = Map.of("message","Error: welp");
+                var msg = Map.of("message","Error: No parameter can be null");
                 ctx.status(500).result(serializer.toJson(msg));
             }
         }
