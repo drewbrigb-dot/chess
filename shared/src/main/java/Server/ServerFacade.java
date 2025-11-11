@@ -4,8 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import model.AuthData;
+import model.CreateRequest;
+import model.GameData;
 import model.UserData;
-
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -35,12 +36,20 @@ public class ServerFacade {
     }
 
     public void logout (String authToken) throws Exception {
-        HttpRequest request = buildRequestLogout("Delete","/session",null,"authorization",authToken);
-
+        HttpRequest request = buildRequestHeader("Delete","/session",null,"authorization",authToken);
         var response = sendRequest(request);
-
         handleResponse(response, null);
     }
+
+    public Integer createGame (String authToken, String gameName) throws Exception{
+        CreateRequest createRequest = new CreateRequest(gameName);
+        HttpRequest request = buildRequestHeader("Post","/game",createRequest,"authorization",authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, null);
+
+    }
+
+    public
 
 
     public void clear()throws Exception {
@@ -48,7 +57,7 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    private HttpRequest buildRequestLogout (String method, String path, Object body, String headerName, String headerValue) {
+    private HttpRequest buildRequestHeader (String method, String path, Object body, String headerName, String headerValue) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .header(headerName,headerValue)

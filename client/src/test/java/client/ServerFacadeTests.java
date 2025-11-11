@@ -75,6 +75,25 @@ public class ServerFacadeTests {
         assertEquals("Error: unauthorized",e.getMessage());
     }
 
+    @Test
+    public void createGame() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        assertDoesNotThrow(() -> facade.createGame(authData.authToken(),"ChessIsStupid"));
+    }
+
+    @Test
+    public void createBadGame() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        Exception e = assertThrows(Exception.class, () -> facade.createGame(authData.authToken(),null)) ;
+        assertEquals("Error: bad request",e.getMessage());
+    }
+
+
+
+
+
 
 
 
