@@ -1,6 +1,6 @@
 package model;
 
-import dataaccess.GameInfo;
+import model.GameInfo;
 
 import java.util.ArrayList;
 

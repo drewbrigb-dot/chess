@@ -13,6 +13,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.ArrayList;
 
 
 public class ServerFacade {
@@ -54,6 +55,14 @@ public class ServerFacade {
         var request = buildRequestHeader("Put","/game",joinGameRequest,"authorization",authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
+    }
+
+    public ArrayList<GameInfo> listGames (String authToken) throws Exception {
+        var request = buildRequestHeader("Get","/game",null,"authorization",authToken);
+        var response = sendRequest(request);
+        ListGamesResult listGamesResult = handleResponse(response, ListGamesResult.class);
+        ArrayList<GameInfo> gameList = listGamesResult.games();
+        return gameList;
     }
 
 

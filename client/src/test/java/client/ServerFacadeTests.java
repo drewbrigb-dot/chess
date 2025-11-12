@@ -1,9 +1,12 @@
 import chess.ChessGame;
 import model.AuthData;
+import model.GameInfo;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import Server.ServerFacade;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -108,6 +111,28 @@ public class ServerFacadeTests {
         Exception e = assertThrows(Exception.class, () -> facade.joinGame(ChessGame.TeamColor.WHITE,badGameID,authData.authToken())) ;
         assertEquals("Error: unauthorized",e.getMessage());
     }
+
+    @Test
+    public void listGames() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        facade.createGame(authData.authToken(),"ChessIsStupid");
+        facade.createGame(authData.authToken(),"PoopGame");
+        ArrayList<GameInfo> list = facade.listGames(authData.authToken());
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    public void listBadGames() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        facade.createGame(authData.authToken(),"ChessIsStupid");
+        facade.createGame(authData.authToken(),"PoopGame");
+        Exception e = assertThrows(Exception.class, () -> facade.listGames("slamdunk")) ;
+        assertEquals("Error: unauthorized",e.getMessage());
+    }
+
+
 
 
 
