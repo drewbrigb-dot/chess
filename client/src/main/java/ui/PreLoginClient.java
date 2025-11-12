@@ -8,18 +8,18 @@ import ui.EscapeSequences.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
-import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
+import static ui.EscapeSequences.*;
 
 public class PreLoginClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
+    private AuthData authData;
 
     public PreLoginClient(ServerFacade server) {
         this.server = server;
     }
 
-public void run() {
+public AuthData run() {
     System.out.println(" Welcome to Chess homie/homegirl.");
     System.out.print(help());
 
@@ -31,33 +31,23 @@ public void run() {
 
         try {
             result = eval(line);
-            System.out.print(BLUE + result);
+            System.out.print(SET_TEXT_COLOR_BLUE + result);
         } catch (Throwable e) {
             var msg = e.toString();
             System.out.print(msg);
         }
+        if(state== State.SIGNEDIN) {
+            return authData;
+        }
     }
     System.out.println();
+    return null;
 
 }
 
-    public String help() {
-        if (state == State.SIGNEDOUT) {
-            return """
-                    - signIn <yourname>
-                    - quit
-                    """;
-        }
-        return """
-                - register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                - login <USERNAME> <PASSWORD> - to play chess
-                - quit - playing chess cause u suck
-                - help - bc ur just a lil baby
-                """;
-    }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print( RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
     public String eval(String input) {
@@ -67,9 +57,9 @@ public void run() {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "register" -> register(params);
-                case "login" -> rescuePet(params);
-                case "quit" -> listPets();
-                case "help" -> signOut();
+                case "login" -> login(params);
+                case "quit" -> "quit";
+                case "help" -> help();
                 default -> help();
             };
         } catch (Exception ex) {
@@ -84,11 +74,35 @@ public void run() {
             String password = params[1];
             String email = params[2];
             UserData userData = new UserData(username,password,email);
-            AuthData authData = server.register(userData);
+            authData = server.register(userData);
+            state=State.SIGNEDIN;
+            return "Register and sign-in successful! as " + authData.username();
 
-            return String.format("You signed in as %s.", visitorName);
         }
-        throw new Exception(Exception.Code.ClientError, "Expected: <yourname>");
+        throw new Exception("Expected: <yourname> <password> <email>");
+    }
+
+    public String login (String ... params) throws Exception {
+        if (params.length >= 1) {
+            state = State.SIGNEDIN;
+            String username = params[0];
+            String password = params[1];
+            UserData userData = new UserData(username, password, null);
+            authData = server.login(userData);
+            state = State.SIGNEDIN;
+            return "Sign-in successful!";
+        }
+        throw new Exception("Expected: <yourname> <password>");
+    }
+
+
+    public String help() {
+        return SET_TEXT_COLOR_BLUE + """
+                - register <USERNAME> <PASSWORD> <EMAIL> - to create an account you stinky baby
+                - login <USERNAME> <PASSWORD> - to play chess cause you have nothing else better to do
+                - quit - playing chess cause u suck
+                - help - bc ur just a lil baby
+                """;
     }
 
 }
