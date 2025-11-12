@@ -87,7 +87,7 @@ public AuthData run() {
             state = State.SIGNEDIN;
             String username = params[0];
             String password = params[1];
-            UserData userData = new UserData(username, password, null);
+            UserData userData = new UserData(username, null, password);
             authData = server.login(userData);
             state = State.SIGNEDIN;
             return "Sign-in successful!";

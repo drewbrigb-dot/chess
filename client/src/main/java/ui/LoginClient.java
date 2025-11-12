@@ -1,13 +1,9 @@
 package ui;
 
 import Server.ServerFacade;
-import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPiece;
 import model.AuthData;
 import model.GameInfo;
-import model.UserData;
-import ui.EscapeSequences.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,15 +29,20 @@ public class LoginClient {
         private State state = State.SIGNEDOUT;
         private AuthData authData;
         private ArrayList<GameInfo> listOfGame;
+        LoginClientReturn loginClientReturn;
 
         public LoginClient(ServerFacade server, AuthData auth) {
             this.server = server;
             this.authData = auth;
+            loginClientReturn = new LoginClientReturn(false,null);
+
         }
 
-    public boolean run() {
+    public LoginClientReturn run() {
         System.out.println(" Welcome to Chess homie/homegirl.");
         System.out.print(help());
+
+
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -56,12 +57,12 @@ public class LoginClient {
                 var msg = e.toString();
                 System.out.print(msg);
             }
-            if(state== State.SIGNEDIN) {
-                return true;
+            if(loginClientReturn.gameJoined()) {
+                return loginClientReturn;
             }
         }
         System.out.println();
-        return false;
+        return loginClientReturn;
 
     }
 
@@ -72,10 +73,10 @@ public class LoginClient {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "logout" -> logout();
-                case "create game" -> createGame(params);
-                case "list games" -> listGames();
-                case "play game" -> playGame(params);
-                case "observe game" -> observeGame(params);
+                case "creategame" -> createGame(params);
+                case "listgames" -> listGames();
+                case "playgame" -> playGame(params);
+                case "observegame" -> observeGame(params);
                 case "help" -> help();
                 default -> help();
             };
@@ -91,10 +92,10 @@ public class LoginClient {
     public String help() {
         return SET_TEXT_COLOR_YELLOW + """
                 - logout - to log your butt out of this game
-                - create game <GAMENAME>  - well you gotta make a game dummy before you can play
-                - list games - what? you don't remember what games you made? it's just you on here
-                - play game <GAMEID> <COLOR> - yeah go ahead play your stupid chess
-                - observe game <GAMEID> - are you that bored?
+                - creategame <GAMENAME>  - well you gotta make a game dummy before you can play
+                - listgames - what? you don't remember what games you made? it's just you on here
+                - playgame <GAMEID> <COLOR> - yeah go ahead play your stupid chess
+                - observegame <GAMEID> - are you that bored?
                 - help - bc ur still a lil baby
                 """;
     }
@@ -102,7 +103,8 @@ public class LoginClient {
     public String logout () throws Exception {
         server.logout(authData.authToken());
         state = State.SIGNEDOUT;
-        return "Logout successful!";
+        System.console().printf( "Logout successful!\n");
+        return "quit";
         //throw new Exception("Expected: <yourname> <password>");
     }
 
@@ -111,22 +113,22 @@ public class LoginClient {
             String gameName = params[0];
             Integer gameID;
             gameID = server.createGame(authData.authToken(),gameName);
-            return "Game created successfully!";
+            return "Game created successfully!\n";
         }
         throw new Exception("Expected: <yourname> <password>");
     }
 
     public String listGames () throws Exception {
-        ArrayList<GameInfo> listGame = server.listGames(authData.authToken());
-        listOfGame = listGame;
+        listOfGame = server.listGames(authData.authToken());
+
         String returnString = "";
         Integer gameNum = 1;
-        for (GameInfo game : listGame) {
+        for (GameInfo game : listOfGame) {
             returnString += gameNum + " " + game.gameName() + " " + "White player: " + game.whiteUsername();
             returnString += " " + "Black player: " + game.blackUsername() + "\n";
             gameNum++;
         }
-        return "There's your list of games. You're welcome.";
+        return returnString + "There's your list of games. You're welcome.\n";
     }
 
     public String playGame (String ... params) throws Exception {
@@ -141,7 +143,7 @@ public class LoginClient {
                 teamColor = ChessGame.TeamColor.BLACK;
             }
 
-            if (listOfGame.isEmpty()) {
+            if (listOfGame == null) {
                 listOfGame = server.listGames(authData.authToken());
             }
 
@@ -152,7 +154,9 @@ public class LoginClient {
 
 
             server.joinGame(teamColor, gameID,authData.authToken());
-            return "Join game successful! Joined game number " + gameID.toString() + "as color " + teamColor.toString();
+            boolean gameJoined = true;
+            loginClientReturn = new LoginClientReturn(gameJoined,teamColor);
+            return "Join game successful! Joined game number " + gameID.toString() + " as color " + teamColor.toString() + "\n";
         }
         throw new Exception("Expected: <yourname> <password>");
     }
@@ -160,27 +164,18 @@ public class LoginClient {
     public String observeGame (String ... params) throws Exception {
         if (params.length >= 1) {
             String game = params[0];
-            String color = params[1];
             ChessGame.TeamColor teamColor = null;
 
-            if (color.equalsIgnoreCase("white") ) {
-                teamColor = ChessGame.TeamColor.WHITE;
-            }else if (color.equalsIgnoreCase("black")) {
-                teamColor = ChessGame.TeamColor.BLACK;
-            }
-
-            if (listOfGame.isEmpty()) {
+            if (listOfGame==null) {
                 listOfGame = server.listGames(authData.authToken());
             }
-
-
             int arrayListID = Integer.parseInt(game) - 1;
+            //Integer gameID = listOfGame.get(arrayListID);
 
-            Integer gameID = listOfGame.get(arrayListID).gameID();
 
-
-            server.joinGame(teamColor, gameID,authData.authToken());
-            return "Join game successful! Joined game number " + gameID.toString() + "as color " + teamColor.toString();
+            boolean gameJoined = true;
+            loginClientReturn = new LoginClientReturn(gameJoined,null);
+            return "Observing game..." + arrayListID + "\n";
         }
         throw new Exception("Expected: <yourname> <password>");
     }

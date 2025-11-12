@@ -1,7 +1,9 @@
 import Server.ServerFacade;
 import chess.*;
 import model.AuthData;
+import ui.GameClient;
 import ui.LoginClient;
+import ui.LoginClientReturn;
 import ui.PreLoginClient;
 
 public class Main {
@@ -16,10 +18,17 @@ public class Main {
         }
 
         try {
+            ChessBoard board = new ChessBoard();
+            LoginClientReturn joinGameInfo = null;
             ServerFacade server = new ServerFacade(serverUrl);
             authData = new PreLoginClient(server).run();
-            if (authData != null) {
-                new LoginClient(server,authData).run();
+            while (authData != null) {
+                joinGameInfo = new LoginClient(server, authData).run();
+                if (joinGameInfo.gameJoined()) {
+                    new GameClient(joinGameInfo.color(),board).run();
+                }else {
+                    authData = new PreLoginClient(server).run();
+                }
             }
 
         } catch (Throwable ex) {
