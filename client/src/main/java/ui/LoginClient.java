@@ -110,7 +110,8 @@ public class LoginClient {
             String gameName = params[0];
             Integer gameID;
             gameID = server.createGame(authData.authToken(),gameName);
-            return "Game created successfully! Your game ID is " + gameID;
+            //does gameId even matter?
+            return "Game created successfully!";
         }
         throw new Exception("Expected: <yourname> <password>");
     }
@@ -127,17 +128,27 @@ public class LoginClient {
         return "There's your list of games. You're welcome.";
     }
 
-    public String joinGame (String ... params) throws Exception {
+    public String playGame (String ... params) throws Exception {
         if (params.length >= 1) {
             String game = params[0];
             String color = params[1];
+            ChessGame.TeamColor teamColor = null;
+
+            if (color.equalsIgnoreCase("white") ) {
+                teamColor = ChessGame.TeamColor.WHITE;
+            }else if (color.equalsIgnoreCase("black")) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            }
+
             Integer gameID = Integer.parseInt(game);
-            ChessGame.TeamColor teamColor =
-            gameID = server.joinGame(authData.authToken(),gameID);
-            return "Game created successfully! Your game ID is " + gameID;
+
+            server.joinGame(teamColor, gameID,authData.authToken());
+            return "Join game successful! Joined game number " + gameID.toString() + "as color " + teamColor.toString();
         }
         throw new Exception("Expected: <yourname> <password>");
     }
+
+
 
 
 
