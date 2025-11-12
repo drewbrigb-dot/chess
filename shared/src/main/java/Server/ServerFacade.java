@@ -1,12 +1,11 @@
 package Server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import model.AuthData;
-import model.CreateRequest;
-import model.GameData;
-import model.UserData;
+import model.*;
+
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -45,11 +44,17 @@ public class ServerFacade {
         CreateRequest createRequest = new CreateRequest(gameName);
         HttpRequest request = buildRequestHeader("Post","/game",createRequest,"authorization",authToken);
         var response = sendRequest(request);
-        return handleResponse(response, null);
+        CreateResult createResult=  handleResponse(response, CreateResult.class);
+        return createResult.gameID();
 
     }
 
-    public
+    public void joinGame (ChessGame.TeamColor color, Integer gameID, String authToken)  throws Exception{
+        JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID);
+        var request = buildRequestHeader("Put","/game",joinGameRequest,"authorization",authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
 
 
     public void clear()throws Exception {

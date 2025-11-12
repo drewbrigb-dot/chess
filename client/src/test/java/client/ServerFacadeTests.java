@@ -1,3 +1,4 @@
+import chess.ChessGame;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -89,6 +90,27 @@ public class ServerFacadeTests {
         Exception e = assertThrows(Exception.class, () -> facade.createGame(authData.authToken(),null)) ;
         assertEquals("Error: bad request",e.getMessage());
     }
+
+    @Test
+    public void joinGame() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        Integer gameID = facade.createGame(authData.authToken(),"ChessIsStupid");
+        assertDoesNotThrow(() -> facade.joinGame(ChessGame.TeamColor.WHITE,gameID,authData.authToken()));
+    }
+
+    @Test
+    public void joinBadGame() throws Exception {
+        UserData userData = new UserData("Ozzy Ozbourne", "ozzy@gmail.com", "offtherails");
+        AuthData authData = facade.register(userData);
+        Integer gameID = facade.createGame(authData.authToken(),"ChessIsStupid");
+        Integer badGameID = 45;
+        Exception e = assertThrows(Exception.class, () -> facade.joinGame(ChessGame.TeamColor.WHITE,badGameID,authData.authToken())) ;
+        assertEquals("Error: unauthorized",e.getMessage());
+    }
+
+
+
 
 
 
