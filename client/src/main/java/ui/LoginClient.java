@@ -32,6 +32,7 @@ public class LoginClient {
         private final ServerFacade server;
         private State state = State.SIGNEDOUT;
         private AuthData authData;
+        private ArrayList<GameInfo> listOfGame;
 
         public LoginClient(ServerFacade server, AuthData auth) {
             this.server = server;
@@ -110,7 +111,6 @@ public class LoginClient {
             String gameName = params[0];
             Integer gameID;
             gameID = server.createGame(authData.authToken(),gameName);
-            //does gameId even matter?
             return "Game created successfully!";
         }
         throw new Exception("Expected: <yourname> <password>");
@@ -118,6 +118,7 @@ public class LoginClient {
 
     public String listGames () throws Exception {
         ArrayList<GameInfo> listGame = server.listGames(authData.authToken());
+        listOfGame = listGame;
         String returnString = "";
         Integer gameNum = 1;
         for (GameInfo game : listGame) {
@@ -140,7 +141,43 @@ public class LoginClient {
                 teamColor = ChessGame.TeamColor.BLACK;
             }
 
-            Integer gameID = Integer.parseInt(game);
+            if (listOfGame.isEmpty()) {
+                listOfGame = server.listGames(authData.authToken());
+            }
+
+
+            int arrayListID = Integer.parseInt(game) - 1;
+
+            Integer gameID = listOfGame.get(arrayListID).gameID();
+
+
+            server.joinGame(teamColor, gameID,authData.authToken());
+            return "Join game successful! Joined game number " + gameID.toString() + "as color " + teamColor.toString();
+        }
+        throw new Exception("Expected: <yourname> <password>");
+    }
+
+    public String observeGame (String ... params) throws Exception {
+        if (params.length >= 1) {
+            String game = params[0];
+            String color = params[1];
+            ChessGame.TeamColor teamColor = null;
+
+            if (color.equalsIgnoreCase("white") ) {
+                teamColor = ChessGame.TeamColor.WHITE;
+            }else if (color.equalsIgnoreCase("black")) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            }
+
+            if (listOfGame.isEmpty()) {
+                listOfGame = server.listGames(authData.authToken());
+            }
+
+
+            int arrayListID = Integer.parseInt(game) - 1;
+
+            Integer gameID = listOfGame.get(arrayListID).gameID();
+
 
             server.joinGame(teamColor, gameID,authData.authToken());
             return "Join game successful! Joined game number " + gameID.toString() + "as color " + teamColor.toString();
