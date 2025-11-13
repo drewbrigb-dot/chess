@@ -1,15 +1,11 @@
 package ui;
 
-import Server.ServerFacade;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.AuthData;
 import model.GameInfo;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 import static ui.EscapeSequences.*;
 
@@ -110,15 +106,7 @@ public class GameClient {
     private void printWhiteFirst (int i, String stringBoard[][],ChessBoard chessBoard) {
 
         for (int j=0;j<8;j++){
-            ChessPosition position = new ChessPosition(i+1,j+1);
-            if (chessBoard.getPiece(position) != null) {
-                ChessGame.TeamColor color = chessBoard.getPiece(position).getTeamColor();
-                if (color == ChessGame.TeamColor.WHITE) {
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                } else {
-                    System.out.print(SET_TEXT_COLOR_RED);
-                }
-            }
+            printHelper(i,j,chessBoard);
             if (j%2 == 0) {
                 System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
             }else {
@@ -127,36 +115,10 @@ public class GameClient {
         }
     }
 
-    /*private void printWhiteFirstReverse (int i, String stringBoard[][]) {
 
-        for (int j=7;j>=0;j--){
-            ChessPosition position = new ChessPosition(i+1,j+1);
-            if (board.getPiece(position) != null) {
-                ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
-                if (color == ChessGame.TeamColor.WHITE) {
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                } else {
-                    System.out.print(SET_TEXT_COLOR_RED);
-                }
-            }
-            if (j%2 == 0) {
-                System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
-            }else {
-                System.out.print(SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
-            }
-        }
-    }*/
     private void printBlackFirst (int i,String stringBoard[][], ChessBoard chessBoard) {
         for (int j=0;j<8;j++){
-            ChessPosition position = new ChessPosition(i+1,j+1);
-            if (chessBoard.getPiece(position) != null) {
-                ChessGame.TeamColor color = chessBoard.getPiece(position).getTeamColor();
-                if (color == ChessGame.TeamColor.WHITE) {
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                } else {
-                    System.out.print(SET_TEXT_COLOR_RED);
-                }
-            }
+            printHelper(i,j,chessBoard);
             if (j%2 == 0) {
                 System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
             }else {
@@ -165,28 +127,15 @@ public class GameClient {
         }
     }
 
-    /*private void printBlackFirstReverse (int i,String stringBoard[][]) {
-        for (int j=7;j>=0;j--){
-            ChessPosition position = new ChessPosition(i+1,j+1);
-            if (board.getPiece(position) != null) {
-                ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
-                if (color == ChessGame.TeamColor.WHITE) {
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                } else {
-                    System.out.print(SET_TEXT_COLOR_RED);
-                }
-            }
-            if (j%2 == 0) {
-                System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
-            }else {
-                System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
+    private void printHelper(int i,int j, ChessBoard chessBoard) {
+        ChessPosition position = new ChessPosition(i+1,j+1);
+        if (chessBoard.getPiece(position) != null) {
+            ChessGame.TeamColor color = chessBoard.getPiece(position).getTeamColor();
+            if (color == ChessGame.TeamColor.WHITE) {
+                System.out.print(SET_TEXT_COLOR_BLUE);
+            } else {
+                System.out.print(SET_TEXT_COLOR_RED);
             }
         }
-    }*/
-
-
-
-
-
-
+    }
 }

@@ -4,7 +4,7 @@ import model.GameInfo;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import Server.ServerFacade;
+import server.ServerFacade;
 
 import java.util.ArrayList;
 

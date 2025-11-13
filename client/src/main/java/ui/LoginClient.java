@@ -1,6 +1,6 @@
 package ui;
 
-import Server.ServerFacade;
+import server.ServerFacade;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameInfo;

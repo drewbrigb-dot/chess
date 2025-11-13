@@ -1,9 +1,8 @@
 package ui;
 
-import Server.ServerFacade;
+import server.ServerFacade;
 import model.AuthData;
 import model.UserData;
-import ui.EscapeSequences.*;
 
 import java.util.Arrays;
 import java.util.Scanner;
