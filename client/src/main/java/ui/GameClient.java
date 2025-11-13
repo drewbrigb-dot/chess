@@ -20,7 +20,8 @@ public class GameClient {
     private AuthData authData;
     private ArrayList<GameInfo> listOfGame;
     ChessGame.TeamColor teamColor;
-    ChessBoard board;
+    public ChessBoard board;
+    public ChessBoard reverseBoard;
 
 
 
@@ -35,13 +36,17 @@ public class GameClient {
 
     public void run() {
         System.out.println("You made it to the Game Client. Now go back!");
+
+
         String [][] boardString = boardToString(board);
+        reverseBoard = new ChessBoard(board.reverseBoard(board));
+        String[][] boardReverseString = boardToString(reverseBoard);
 
 
         if (teamColor == ChessGame.TeamColor.BLACK) {
-            printBlackBoard(boardString);
+            printBlackBoard(boardReverseString,reverseBoard);
         }else {
-            printWhiteBoard(boardString);
+            printWhiteBoard(boardString,board);
         }
     }
 
@@ -65,7 +70,25 @@ public class GameClient {
         return boardString;
     }
 
-    private void printBlackBoard (String[][] board) {
+    private void printBlackBoard (String[][] board, ChessBoard reverseBoard) {
+        System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   h  g  f  e  d  c  b  a    " + RESET_BG_COLOR);
+        System.out.print(RESET_TEXT_COLOR +RESET_BG_COLOR);
+        for (int i=7; i>=0;i--) {
+            int col = 8 - i;
+            System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
+
+            if (i%2 == 0) {
+                printWhiteFirst(i, board,reverseBoard);
+            }else {
+                printBlackFirst(i, board,reverseBoard);
+            }
+
+            System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
+        }
+        System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   h  g  f  e  d  c  b  a    " + RESET_BG_COLOR);
+    }
+
+    private void printWhiteBoard (String[][] board, ChessBoard regBoard) {
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   a  b  c  d  e  f  g  h    " + RESET_BG_COLOR);
         System.out.print(RESET_TEXT_COLOR +RESET_BG_COLOR);
         for (int i=7; i>=0;i--) {
@@ -73,9 +96,9 @@ public class GameClient {
             System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
 
             if (i%2 == 0) {
-                printWhiteFirst(i, board);
+                printWhiteFirst(i, board,regBoard);
             }else {
-                printBlackFirst(i, board);
+                printBlackFirst(i, board,regBoard);
             }
 
             System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
@@ -83,31 +106,30 @@ public class GameClient {
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   a  b  c  d  e  f  g  h    " + RESET_BG_COLOR);
     }
 
-    private void printWhiteBoard (String[][] board) {
-        System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   a  b  c  d  e  f  g  h    " + RESET_BG_COLOR);
-        System.out.print(RESET_TEXT_COLOR +RESET_BG_COLOR);
-        for (int i=7; i>=0;i--) {
-            int col = i + 1;
-            System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
 
-            if (i%2 == 0) {
-                printWhiteFirst(i, board);
-            }else {
-                printBlackFirst(i, board);
-            }
-
-            System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
-        }
-        System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   a  b  c  d  e  f  g  h    " + RESET_BG_COLOR);
-    }
-
-    private void printBlackBoard(String[][]board) {
-
-    }
-
-    private void printWhiteFirst (int i, String stringBoard[][]) {
+    private void printWhiteFirst (int i, String stringBoard[][],ChessBoard chessBoard) {
 
         for (int j=0;j<8;j++){
+            ChessPosition position = new ChessPosition(i+1,j+1);
+            if (chessBoard.getPiece(position) != null) {
+                ChessGame.TeamColor color = chessBoard.getPiece(position).getTeamColor();
+                if (color == ChessGame.TeamColor.WHITE) {
+                    System.out.print(SET_TEXT_COLOR_BLUE);
+                } else {
+                    System.out.print(SET_TEXT_COLOR_RED);
+                }
+            }
+            if (j%2 == 0) {
+                System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
+            }else {
+                System.out.print(SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
+            }
+        }
+    }
+
+    /*private void printWhiteFirstReverse (int i, String stringBoard[][]) {
+
+        for (int j=7;j>=0;j--){
             ChessPosition position = new ChessPosition(i+1,j+1);
             if (board.getPiece(position) != null) {
                 ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
@@ -123,9 +145,28 @@ public class GameClient {
                 System.out.print(SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
             }
         }
-    }
-    private void printBlackFirst (int i,String stringBoard[][]) {
+    }*/
+    private void printBlackFirst (int i,String stringBoard[][], ChessBoard chessBoard) {
         for (int j=0;j<8;j++){
+            ChessPosition position = new ChessPosition(i+1,j+1);
+            if (chessBoard.getPiece(position) != null) {
+                ChessGame.TeamColor color = chessBoard.getPiece(position).getTeamColor();
+                if (color == ChessGame.TeamColor.WHITE) {
+                    System.out.print(SET_TEXT_COLOR_BLUE);
+                } else {
+                    System.out.print(SET_TEXT_COLOR_RED);
+                }
+            }
+            if (j%2 == 0) {
+                System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
+            }else {
+                System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
+            }
+        }
+    }
+
+    /*private void printBlackFirstReverse (int i,String stringBoard[][]) {
+        for (int j=7;j>=0;j--){
             ChessPosition position = new ChessPosition(i+1,j+1);
             if (board.getPiece(position) != null) {
                 ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
@@ -141,7 +182,7 @@ public class GameClient {
                 System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
             }
         }
-    }
+    }*/
 
 
 

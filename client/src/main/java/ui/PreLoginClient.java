@@ -22,7 +22,6 @@ public class PreLoginClient {
 public AuthData run() {
     System.out.println(" Welcome to Chess homie/homegirl.");
     System.out.print(help());
-
     Scanner scanner = new Scanner(System.in);
     var result = "";
     while (!result.equals("quit")) {
@@ -68,7 +67,7 @@ public AuthData run() {
     }
 
     public String register(String... params) throws Exception {
-        if (params.length >= 1) {
+        if (params.length == 3) {
             state = State.SIGNEDIN;
             String username = params[0];
             String password = params[1];
@@ -79,21 +78,28 @@ public AuthData run() {
             return "Register and sign-in successful! as " + authData.username();
 
         }
-        throw new Exception("Expected: <yourname> <password> <email>");
+        return "Please give 3 values, it's really not that hard <username> <password> <email> \n";
     }
 
     public String login (String ... params) throws Exception {
-        if (params.length >= 1) {
-            state = State.SIGNEDIN;
+        if (params.length == 2) {
             String username = params[0];
             String password = params[1];
             UserData userData = new UserData(username, null, password);
-            authData = server.login(userData);
+            try {
+                authData = server.login(userData);
+            } catch (Exception ex) {
+                if (ex.getMessage().equals("Error: unauthorized")) {
+                    return "Bad login loser \n";
+                }
+            }
+        }else {
+            return "Please enter two values poopy boy <username> <password> \n";
+        }
             state = State.SIGNEDIN;
             return "Sign-in successful!";
         }
-        throw new Exception("Expected: <yourname> <password>");
-    }
+
 
 
     public String help() {

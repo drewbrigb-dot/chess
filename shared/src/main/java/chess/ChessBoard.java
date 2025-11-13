@@ -35,6 +35,7 @@ public class ChessBoard {
 
     }
     // two dimensional array
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -43,8 +44,6 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board [position.getRow()-1][position.getColumn()-1] = piece;
-
-
     }
 
     /**
@@ -111,6 +110,24 @@ public class ChessBoard {
         }
 
 
+    }
+
+    public ChessBoard reverseBoard (ChessBoard boardCopy) {
+        ChessBoard reverse = new ChessBoard();
+
+        int rowSize = board.length;
+        int colSize = board[0].length;
+        for (int x =0;x < rowSize; x++) {
+            for (int y=0; y<colSize;y++) {
+                ChessPosition positionReverse = new ChessPosition(rowSize-x,colSize-y);
+                ChessPosition positionOld = new ChessPosition(x+1,y+1);
+                if (boardCopy.getPiece(positionOld) != null) {
+                    ChessPiece piece = new ChessPiece(boardCopy.getPiece(positionOld).getTeamColor(), boardCopy.getPiece(positionOld).getPieceType());
+                    reverse.addPiece(positionReverse, piece);
+                }
+            }
+        }
+        return reverse;
     }
 
 
