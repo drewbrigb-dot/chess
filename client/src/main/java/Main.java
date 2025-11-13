@@ -19,6 +19,7 @@ public class Main {
 
         try {
             ChessBoard board = new ChessBoard();
+            board.resetBoard();
             LoginClientReturn joinGameInfo = null;
             ServerFacade server = new ServerFacade(serverUrl);
             authData = new PreLoginClient(server).run();
