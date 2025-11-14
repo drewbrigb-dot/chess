@@ -1,3 +1,5 @@
+package client;
+
 import chess.ChessGame;
 import model.AuthData;
 import model.GameInfo;
