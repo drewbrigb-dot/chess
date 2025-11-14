@@ -67,12 +67,17 @@ public AuthData run() {
 
     public String register(String... params) throws Exception {
         if (params.length == 3) {
-            state = State.SIGNEDIN;
             String username = params[0];
             String password = params[1];
             String email = params[2];
             UserData userData = new UserData(username,password,email);
-            authData = server.register(userData);
+            try {
+                authData = server.register(userData);
+            }catch (Exception ex) {
+                if (ex.getMessage().equals("Error: username already taken")) {
+                    return "Yo chill, someone else gots that username bro.\n";
+                }
+            }
             state=State.SIGNEDIN;
             return "Register and sign-in successful! as " + authData.username();
 

@@ -79,6 +79,9 @@ public class LoginClient {
                 default -> help();
             };
         } catch (Exception ex) {
+            if (ex.getMessage().startsWith("For input string:")) {
+                return "Please enter a digit. Don't spell it. Don't be trying to be all smart on me now.\n";
+            }
             return ex.getMessage();
         }
     }
