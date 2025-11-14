@@ -131,17 +131,4 @@ public class ServerFacadeTests {
         Exception e = assertThrows(Exception.class, () -> facade.listGames("slamdunk")) ;
         assertEquals("Error: unauthorized",e.getMessage());
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
