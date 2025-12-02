@@ -26,7 +26,7 @@ public class Main {
             while (authData != null) {
                 joinGameInfo = new LoginClient(server, authData).run();
                 if (joinGameInfo.gameJoined()) {
-                    new GameClient(joinGameInfo.color(),board).run();
+                    new GameClient(server,joinGameInfo.color(),board,joinGameInfo.gameID(), authData.authToken()).run();
                 }else {
                     authData = new PreLoginClient(server).run();
                 }

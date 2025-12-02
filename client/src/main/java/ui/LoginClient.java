@@ -34,7 +34,7 @@ public class LoginClient {
         public LoginClient(ServerFacade server, AuthData auth) {
             this.server = server;
             this.authData = auth;
-            loginClientReturn = new LoginClientReturn(false,null);
+            loginClientReturn = new LoginClientReturn(false,null, null,null);
 
         }
 
@@ -106,7 +106,6 @@ public class LoginClient {
         state = State.SIGNEDOUT;
         System.console().printf( "Logout successful!\n");
         return "quit";
-        //throw new Exception("Expected: <yourname> <password>");
     }
 
     public String createGame (String ... params) throws Exception {
@@ -170,7 +169,7 @@ public class LoginClient {
                 }
             }
             boolean gameJoined = true;
-            loginClientReturn = new LoginClientReturn(gameJoined,teamColor);
+            loginClientReturn = new LoginClientReturn(gameJoined,gameID,teamColor,authData.authToken());
             return "Join game successful! Joined game number " + gameID.toString() + " as color " + teamColor.toString() + "\n";
         }else {
             return "do you even want to play at this point: <gameID> <color>\n";
@@ -199,7 +198,7 @@ public class LoginClient {
 
 
             boolean gameJoined = true;
-            loginClientReturn = new LoginClientReturn(gameJoined,null);
+            loginClientReturn = new LoginClientReturn(gameJoined,null,null, null);
             return "Observing game..." + arrayListID + "\n";
         }
         return "just tell me the game you want to watch, it's not twitch out here: <gameID>\n";
