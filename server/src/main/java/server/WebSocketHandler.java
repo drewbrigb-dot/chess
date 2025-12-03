@@ -45,8 +45,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), command.getAuthToken(),ctx.session);
-               /* case MAKE_MOVE -> makeMove(command.getGameID(),command.getAuthToken(), ctx.session);
-                case LEAVE -> leave(command.getGameID(), command.getAuthToken(), ctx.session);
+                case MAKE_MOVE -> makeMove(command.getGameID(),command.getAuthToken(), ctx.session);
+                /*case LEAVE -> leave(command.getGameID(), command.getAuthToken(), ctx.session);
                 case RESIGN -> resign(., ctx.session);*/
             }
         } catch (IOException | DataAccessException ex) {
@@ -76,17 +76,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-  /*  private void makeMove(Integer gameID, String authToken, Session session) throws IOException, DataAccessException {
+    private void makeMove(Integer gameID, String authToken, Session session) throws IOException, DataAccessException {
         String username = authDataAccess.getAuth(authToken).username();
         var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy)",username);
         ServerMessage loadGameToAll = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
-        ServerMessage loadGameBroadcast = new NotificationMessage(message);
+        ServerMessage loadGameExceptRoot = new NotificationMessage(message);
         connections.broadcastToAll(loadGameToAll,gameID);
-        connections.broadcastRootClient(session, loadGameBroadcast, gameID);
+        connections.broadcastExceptRoot(session, loadGameExceptRoot, gameID);
 
     }
 
-    public void leave(Integer gameID, String authToken, Session session) throws DataAccessException, IOException {
+   /* public void leave(Integer gameID, String authToken, Session session) throws DataAccessException, IOException {
         String username = authDataAccess.getAuth(authToken).username();
         var message = String.format("%s left the game because he's scared",username);
         ServerMessage loadGameBroadcast = new NotificationMessage(message);
