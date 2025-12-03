@@ -15,6 +15,7 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -61,11 +62,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void connect(Integer gameID, String authToken, Session session) throws IOException, DataAccessException {
         var serializer = new Gson();
         connections.add(gameID,session);
-        var message = String.format("yo %s", authDataAccess.getAuth(authToken).username());
-        ServerMessage loadGameToRoot = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
-        ServerMessage loadGameToAll = new NotificationMessage(message);
-        connections.broadcastRootClient(session, loadGameToRoot, gameID);
-        connections.broadcastExceptRoot(session,loadGameToAll,gameID);
+        if (gameDataAccess.getGame(gameID) == null || authDataAccess.getAuth(authToken) == null)  {
+            var message = String.format("Error! you gave me a bad ID %s, what in the world are you doing bro", gameID);
+            ServerMessage badGameID = new ErrorMessage(message);
+            connections.broadcastErrorToRoot(session,badGameID);
+        }else {
+            var message = String.format("yo %s", authDataAccess.getAuth(authToken).username());
+            ServerMessage loadGameToRoot = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
+            ServerMessage loadGameToAll = new NotificationMessage(message);
+            connections.broadcastRootClient(session, loadGameToRoot, gameID);
+            connections.broadcastExceptRoot(session, loadGameToAll, gameID);
+        }
 
     }
 

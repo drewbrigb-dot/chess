@@ -56,6 +56,19 @@ public class ConnectionManager {
             }
         }
     }
+
+    public void broadcastErrorToRoot(Session excludeSession, ServerMessage serverMessage) throws IOException {
+        var serializer = new Gson();
+        String msg = serializer.toJson(serverMessage);
+        for (Set<Session> sessions : connections.values()) {
+            for (Session session: sessions)
+                if (session.isOpen()) {
+                    if (session.equals(excludeSession)) {
+                        session.getRemote().sendString(msg);
+                    }
+                }
+            }
+    }
     public void broadcastToAll(ServerMessage serverMessage,Integer gameID) throws IOException {
         if(connections.get(gameID) == null) {return;}
         var serializer = new Gson();
