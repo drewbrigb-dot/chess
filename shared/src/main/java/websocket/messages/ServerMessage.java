@@ -2,6 +2,7 @@ package websocket.messages;
 
 import java.util.Objects;
 
+
 /**
  * Represents a Message the server can send through a WebSocket
  * <p>
@@ -24,6 +25,7 @@ public class ServerMessage {
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
     }
+
 
     @Override
     public boolean equals(Object o) {

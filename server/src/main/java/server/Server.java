@@ -8,7 +8,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import service.GameService;
 import service.UserService;
-
+import server.WebSocketHandler;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -18,11 +18,13 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
+    private  WebSocketHandler webSocketHandler;
     UserDataAccess userDataAccess;
     GameDataAccess gameDataAccess;
     AuthDataAccess authDataAccess;
 
     public Server()  {
+
 
         try {
             userDataAccess = new SQLUserDataAccess();
@@ -34,7 +36,7 @@ public class Server {
             gameDataAccess = new GameMemoryDataAccess();
             authDataAccess = new AuthMemoryDataAccess();
         }
-
+        webSocketHandler = new WebSocketHandler(authDataAccess,gameDataAccess);
         //instances of db classes?
         userService = new UserService(userDataAccess,authDataAccess);
         gameService = new GameService(gameDataAccess,authDataAccess);
@@ -49,6 +51,11 @@ public class Server {
         server.delete("db",ctx->clear(ctx));
         server.get("game", ctx-> listGames(ctx));
         server.put("game", ctx->joinGame(ctx));
+        server.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
     }
 
