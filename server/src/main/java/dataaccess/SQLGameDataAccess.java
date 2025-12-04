@@ -185,4 +185,40 @@ public class SQLGameDataAccess implements GameDataAccess{
 
 
     }
+
+    public void updateGame(ChessGame game, Integer gameID) throws DataAccessException {
+
+        String statement;
+        var serializer = new Gson();
+        statement = "UPDATE GameData SET game=? WHERE gameID=?";
+        String jsonChess = serializer.toJson(game);
+
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1,jsonChess);
+                preparedStatement.setString(2,String.valueOf(gameID));
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("da freak");
+        }
+    }
+
+    public void updateUsernames(String whiteUsername, String blackUsername, Integer gameID) throws DataAccessException {
+        String statement;
+        var serializer = new Gson();
+        statement = "UPDATE GameData SET whiteUsername=?, blackUsername=? WHERE gameID=?";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1,whiteUsername);
+                preparedStatement.setString(2,blackUsername);
+                preparedStatement.setString(3,gameID.toString());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("da freak");
+        }
+    }
 }

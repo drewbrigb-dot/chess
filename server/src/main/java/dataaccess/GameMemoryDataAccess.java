@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import model.GameInfo;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
@@ -48,6 +49,17 @@ public class GameMemoryDataAccess implements GameDataAccess {
     }
 
     @Override
+    public void updateGame(ChessGame game, Integer gameID) {
+       GameData gameDataInfo = gameData.get(gameID);
+       String whiteUsername = gameDataInfo.whiteUsername();
+       String blackUsername = gameDataInfo.blackUsername();
+       String gameName = gameDataInfo.gameName();
+       GameData newGame = new GameData(gameID,whiteUsername,blackUsername,gameName,game);
+       gameData.put(gameID,newGame);
+    }
+
+
+    @Override
     public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String newUsername) {
         GameData oldGame = gameData.get(gameID);
         String whiteUsername = oldGame.whiteUsername();
@@ -62,6 +74,15 @@ public class GameMemoryDataAccess implements GameDataAccess {
         gameData.remove(gameID);
         gameData.put(gameID,newGame);
 
+    }
+
+    @Override
+    public void updateUsernames (String whiteUsername, String blackUsername, Integer gameID) {
+        GameData gameDataLocal = gameData.get(gameID);
+        String gameName = gameDataLocal.gameName();
+        ChessGame chessGame = gameDataLocal.game();
+        GameData newGameData = new GameData(gameID,whiteUsername,blackUsername,gameName,chessGame);
+        gameData.put(gameID,newGameData);
     }
 
     @Override

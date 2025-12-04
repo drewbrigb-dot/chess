@@ -12,6 +12,8 @@ public interface GameDataAccess  {
     void clearGame() throws DataAccessException;
     void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) throws DataAccessException;
     void createDatabase() throws DataAccessException;
+    void updateGame(ChessGame game, Integer gameID)throws DataAccessException;
+    void updateUsernames(String whiteUsername, String blackUsername, Integer gameID) throws DataAccessException;
 
     //update Game??
 

@@ -28,7 +28,8 @@ public class ConnectionManager {
     public void remove(Integer gameID,Session session) {
         Set<Session> sessions = connections.get(gameID);
         sessions.remove(session);
-        connections.remove(gameID, sessions);
+        connections.remove(gameID);
+        connections.put(gameID, sessions);
     }
 
     public void broadcastExceptRoot(Session excludeSession, ServerMessage serverMessage, Integer gameID) throws IOException {
@@ -61,13 +62,14 @@ public class ConnectionManager {
         var serializer = new Gson();
         String msg = serializer.toJson(serverMessage);
         for (Set<Session> sessions : connections.values()) {
-            for (Session session: sessions)
+            for (Session session : sessions) {
                 if (session.isOpen()) {
                     if (session.equals(excludeSession)) {
                         session.getRemote().sendString(msg);
                     }
                 }
             }
+        }
     }
     public void broadcastToAll(ServerMessage serverMessage,Integer gameID) throws IOException {
         if(connections.get(gameID) == null) {return;}
