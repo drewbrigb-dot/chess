@@ -86,112 +86,100 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(MakeMoveCommand moveCommand, Session session) throws IOException, DataAccessException {
-
-
-        if (moveCommand != null) {
-            Integer gameID = moveCommand.getGameID();
-            String authToken = moveCommand.getAuthToken();
-            if (gameDataAccess.getGame(gameID) == null || authDataAccess.getAuth(authToken) == null) {
-                String message;
-                if (gameDataAccess.getGame(gameID) == null) {
-                    message = String.format("Error! you gave me a bad ID %s, what in the world are you doing bro", gameID);
-                } else if (authDataAccess.getAuth(authToken) == null) {
-                    message = String.format("Error! You can't do that! what in the world are you doing bro", gameID);
-                } else {
-                    message = String.format("Error!", gameID);
-                }
-                ServerMessage badGameID = new ErrorMessage(message);
-                connections.broadcastErrorToRoot(session, badGameID);
-            } else {
-                ChessGame chessGame = gameDataAccess.getGame(gameID).game();
-
-                if(chessGame.getGameOver()) {
-                    var message = String.format("Error! Game is over jitt, why you tryna change the past?");
-                    ServerMessage badGameID = new ErrorMessage(message);
-                    connections.broadcastErrorToRoot(session, badGameID);
-                    return;
-                }
-
-                boolean validMove = true;
-                try {
-                    chessGame.makeMove(moveCommand.getMove());
-                } catch (InvalidMoveException e) {
-                    validMove = false;
-                }
-                if (!validMove) {
-                    String message = String.format("Error! Bad move. Don't be a cheater");
-                    ServerMessage badGameID = new ErrorMessage(message);
-                    connections.broadcastErrorToRoot(session, badGameID);
-                    return;
-                }
-
-                //check to see if move is with correct team's piece
-                String username = authDataAccess.getAuth(authToken).username();
-                ChessGame.TeamColor userColor;
-                ChessGame game = gameDataAccess.getGame(gameID).game();
-                String blackUsername = gameDataAccess.getGame(gameID).blackUsername();
-                String whiteUsername = gameDataAccess.getGame(gameID).whiteUsername();
-                if (Objects.equals(blackUsername, username)){
-                    userColor = ChessGame.TeamColor.BLACK;
-                }else if (Objects.equals(whiteUsername, username)){
-                    userColor = ChessGame.TeamColor.WHITE;
-                }else {
-                    String message = String.format("Error! Hands off fella, you just said you wanted to watch buddy.");
-                    ServerMessage badGameID = new ErrorMessage(message);
-                    connections.broadcastErrorToRoot(session, badGameID);
-                    return;
-                }
-                ChessGame.TeamColor teamColor = game.getTeamTurn();
-                if (teamColor != userColor) {
-                    String message = String.format("Error! You dirty scumbag. It's not your turn!");
-                    ServerMessage badGameID = new ErrorMessage(message);
-                    connections.broadcastErrorToRoot(session, badGameID);
-                    return;
-                }
-                //end check
-
-
-
-
-                var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy)", username);
-                ServerMessage loadGameToAll = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
-                ServerMessage loadGameExceptRoot = new NotificationMessage(message);
-                connections.broadcastToAll(loadGameToAll, gameID);
-                connections.broadcastExceptRoot(session, loadGameExceptRoot, gameID);
-                gameDataAccess.updateGame(chessGame,gameID);
-
-
-                ChessGame newGame = gameDataAccess.getGame(gameID).game();
-
-
-                if (newGame.isInCheckmate(userColor)) {
-                    String checkMessage;
-                    checkMessage = String.format("%s dude you're cooked. Checkmate baby.", username);
-                    ServerMessage notificationMessage = new NotificationMessage(checkMessage);
-                    connections.broadcastToAll(notificationMessage, gameID);
-
-                }else if (newGame.isInStalemate(userColor)) {
-                    String checkMessage;
-                    checkMessage = String.format("%s you spent all this time and looked where it got you." +
-                            "Absolutely nowhere.'Twas a stalemate.", username);
-                    ServerMessage notificationMessage = new NotificationMessage(checkMessage);
-                    connections.broadcastToAll(notificationMessage, gameID);
-                }else if (newGame.isInCheck(userColor)){
-                    String checkMessage;
-                    checkMessage = String.format("%s you're almost done! Someone's in check!", username);
-                    ServerMessage notificationMessage = new NotificationMessage(checkMessage);
-                    connections.broadcastToAll(notificationMessage, gameID);
-                }
-
-            }
-        }else {
+        if (moveCommand == null) {
             var message = String.format("Give the right command fool!");
             ServerMessage badGameID = new ErrorMessage(message);
             connections.broadcastErrorToRoot(session, badGameID);
-
+            return;
         }
+        Integer gameID = moveCommand.getGameID();
+        String authToken = moveCommand.getAuthToken();
+        if (gameDataAccess.getGame(gameID) == null || authDataAccess.getAuth(authToken) == null) {
+            String message;
+            if (gameDataAccess.getGame(gameID) == null) {
+                message = String.format("Error! you gave me a bad ID %s, what in the world are you doing bro", gameID);
+            } else if (authDataAccess.getAuth(authToken) == null) {
+                message = String.format("Error! You can't do that! what in the world are you doing bro", gameID);
+            } else {
+                message = String.format("Error!", gameID);
+            }
+            ServerMessage badGameID = new ErrorMessage(message);
+            connections.broadcastErrorToRoot(session, badGameID);
+        } else {
+            ChessGame chessGame = gameDataAccess.getGame(gameID).game();
 
+            if(chessGame.getGameOver()) {
+                var message = String.format("Error! Game is over jitt, why you tryna change the past?");
+                ServerMessage badGameID = new ErrorMessage(message);
+                connections.broadcastErrorToRoot(session, badGameID);
+                return;
+            }
 
+            boolean validMove = true;
+            try {
+                chessGame.makeMove(moveCommand.getMove());
+            } catch (InvalidMoveException e) {
+                validMove = false;
+            }
+            if (!validMove) {
+                String message = String.format("Error! Bad move. Don't be a cheater");
+                ServerMessage badGameID = new ErrorMessage(message);
+                connections.broadcastErrorToRoot(session, badGameID);
+                return;
+            }
+
+            //check to see if move is with correct team's piece
+            String username = authDataAccess.getAuth(authToken).username();
+            ChessGame.TeamColor userColor;
+            ChessGame game = gameDataAccess.getGame(gameID).game();
+            String blackUsername = gameDataAccess.getGame(gameID).blackUsername();
+            String whiteUsername = gameDataAccess.getGame(gameID).whiteUsername();
+            if (Objects.equals(blackUsername, username)){
+                userColor = ChessGame.TeamColor.BLACK;
+            }else if (Objects.equals(whiteUsername, username)){
+                userColor = ChessGame.TeamColor.WHITE;
+            }else {
+                String message = String.format("Error! Hands off fella, you just said you wanted to watch buddy.");
+                ServerMessage badGameID = new ErrorMessage(message);
+                connections.broadcastErrorToRoot(session, badGameID);
+                return;
+            }
+            ChessGame.TeamColor teamColor = game.getTeamTurn();
+            if (teamColor != userColor) {
+                String message = String.format("Error! You dirty scumbag. It's not your turn!");
+                ServerMessage badGameID = new ErrorMessage(message);
+                connections.broadcastErrorToRoot(session, badGameID);
+                return;
+            }
+            //end check
+            var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy)", username);
+            ServerMessage loadGameToAll = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
+            ServerMessage loadGameExceptRoot = new NotificationMessage(message);
+            connections.broadcastToAll(loadGameToAll, gameID);
+            connections.broadcastExceptRoot(session, loadGameExceptRoot, gameID);
+            gameDataAccess.updateGame(chessGame,gameID);
+
+            ChessGame newGame = gameDataAccess.getGame(gameID).game();
+
+            if (newGame.isInCheckmate(userColor)) {
+                String checkMessage;
+                checkMessage = String.format("%s dude you're cooked. Checkmate baby.", username);
+                ServerMessage notificationMessage = new NotificationMessage(checkMessage);
+                connections.broadcastToAll(notificationMessage, gameID);
+
+            }else if (newGame.isInStalemate(userColor)) {
+                String checkMessage;
+                checkMessage = String.format("%s you spent all this time and looked where it got you." +
+                        "Absolutely nowhere.'Twas a stalemate.", username);
+                ServerMessage notificationMessage = new NotificationMessage(checkMessage);
+                connections.broadcastToAll(notificationMessage, gameID);
+            }else if (newGame.isInCheck(userColor)){
+                String checkMessage;
+                checkMessage = String.format("%s you're almost done! Someone's in check!", username);
+                ServerMessage notificationMessage = new NotificationMessage(checkMessage);
+                connections.broadcastToAll(notificationMessage, gameID);
+            }
+        }
     }
 
    public void leave(Integer gameID, String authToken, Session session) throws DataAccessException, IOException {
