@@ -1,4 +1,5 @@
 package Websocket;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import org.eclipse.jetty.server.Server;
 import websocket.commands.MakeMoveCommand;
@@ -11,6 +12,8 @@ import jakarta.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
 
 public class WebsocketFacade extends Endpoint {
 
@@ -31,7 +34,16 @@ public class WebsocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(serverMessage);
+                    if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR ) {
+                        ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                        notificationHandler.notifyError(errorMessage);
+                    }else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        LoadGameMessage loadMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                        notificationHandler.notifyLoad(loadMessage);
+                    }else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
+                        NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+                        notificationHandler.notifyNotification(notificationMessage);
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -43,7 +55,7 @@ public class WebsocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void connectFunction(String authToken, Integer gameID) throws Exception {
+    public void connect(String authToken, Integer gameID) throws Exception {
         try {
             var commandType = new UserGameCommand (UserGameCommand.CommandType.CONNECT, authToken,gameID );
             this.session.getBasicRemote().sendText(new Gson().toJson(commandType));
@@ -52,10 +64,10 @@ public class WebsocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, Integer gameID) throws Exception {
+    public void makeMove(String authToken, Integer gameID, ChessMove move) throws Exception {
         try {
-            var commandType = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken,gameID);
-            this.session.getBasicRemote().sendText(new Gson().toJson(commandType));
+            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(authToken,gameID,move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
         } catch (IOException ex) {
             throw new Exception(ex.getMessage());
         }

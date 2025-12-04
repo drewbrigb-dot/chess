@@ -1,15 +1,21 @@
 package ui;
 
+import Websocket.NotificationHandler;
+import Websocket.WebsocketFacade;
 import chess.*;
 import model.AuthData;
 import model.GameInfo;
 import server.ServerFacade;
-
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 import static ui.EscapeSequences.*;
+
 
 import java.util.*;
 
-public class GameClient {
+public class GameClient implements NotificationHandler {
     //private final ServerFacade server;
     private String authToken;
     private ArrayList<GameInfo> listOfGame;
@@ -19,24 +25,22 @@ public class GameClient {
     public ChessGame chessGame;
     private final ServerFacade server;
     public int gameID;
+    private final WebsocketFacade ws;
+    ChessGame game;
 
-    public GameClient(ServerFacade server, ChessGame.TeamColor color, ChessBoard board, int gameID, String authToken) {
+    public GameClient(ServerFacade server, ChessGame.TeamColor color, ChessBoard board, int gameID,
+                      String authToken,String serverUrl) throws Exception {
         this.server = server;
         teamColor = color;
         this.board = board;
         this.gameID = gameID;
-        chessGame = new ChessGame();
         this.authToken = authToken;
-
-
+        ws = new WebsocketFacade(serverUrl, this);
     }
 
     public void run() {
-        chessGame.setBoard(board);
-        redraw();
-        System.out.println("You made it to the Game Client. Now go back!");
-
-        System.out.print(help());
+        connectToGame();
+        System.out.println("You made it to the Game Client. Let's see how long you last.\n");
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -76,6 +80,21 @@ public class GameClient {
                 return "Please enter a digit. Don't spell it. Don't be trying to be all smart on me now.\n";
             }
             return ex.getMessage();
+        }
+    }
+    private String redraw() {
+        String[][] boardString = boardToString(board);
+        reverseBoard = new ChessBoard(board.reverseBoard(board));
+        String[][] boardReverseString = boardToString(reverseBoard);
+        System.out.println("\n");
+        if (teamColor == ChessGame.TeamColor.BLACK) {
+            printBlackBoard(boardReverseString, reverseBoard);
+            System.out.println("Board reprint successful!\n");
+            return"";
+
+        } else {
+            printWhiteBoard(boardString, board);
+            return "Board reprint successful!\n";
         }
     }
 
@@ -180,23 +199,11 @@ public class GameClient {
                 - resign - give up chess, go touch grass 
                 - highlight - highlights what moves you can make, it's not an excuse to start sniffing markers okay?
                 - help - bc you've always been just a stupid baby
+                
                 """;
     }
 
-    private String redraw() {
-        String[][] boardString = boardToString(board);
-        reverseBoard = new ChessBoard(board.reverseBoard(board));
-        String[][] boardReverseString = boardToString(reverseBoard);
 
-        if (teamColor == ChessGame.TeamColor.BLACK) {
-            printBlackBoard(boardReverseString, reverseBoard);
-            return "Board reprint successful!";
-
-        } else {
-            printWhiteBoard(boardString, board);
-            return "Board reprint successful!\n";
-        }
-    }
 
     public String move (String ... params) throws Exception {
         if (params.length == 2) {
@@ -205,30 +212,32 @@ public class GameClient {
 
             char row = start.charAt(0);
             int rowInt = Character.toLowerCase(row) - 'a' + 1;
-            char col = start.charAt(1);
-            int colInt = Character.getNumericValue(col);
-            ChessPosition positionStart = new ChessPosition(rowInt,colInt);
+            char colStart = start.charAt(1);
+            int colInt = Character.getNumericValue(colStart);
+            ChessPosition positionStart = new ChessPosition(colInt,rowInt);
 
             row = end.charAt(0);
             rowInt = Character.toLowerCase(row) - 'a' + 1;
-            colInt = Character.getNumericValue(col);
-            ChessPosition positionEnd = new ChessPosition(rowInt,colInt);
+            char colEnd = end.charAt(1);
+            colInt = Character.getNumericValue(colEnd);
+            ChessPosition positionEnd = new ChessPosition(colInt,rowInt);
 
             ChessMove move = new ChessMove(positionStart,positionEnd,null);
-            chessGame.makeMove(move);
-            return "Move made successfully weirdo";
+
+            ws.makeMove(authToken,gameID,move);
+            return "Move made successfully weirdo\n";
         }else {
             return "Please enter two chess locations like 'A2 D4': <String,String>\n";
         }
     }
 
-    private String resign () {
+    private String resign () throws Exception {
         Scanner scanner = new Scanner(System.in);
         System.out.print( RESET_TEXT_COLOR + "Are you sure you want to resign sonny boy? <yes or no>\n" + SET_TEXT_COLOR_GREEN);
         System.out.print( RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
         String line = scanner.nextLine();
         if (Objects.equals(line, "yes")){
-            chessGame = new ChessGame();
+            ws.resign(authToken,gameID);
             return "quit";
         }else if (Objects.equals(line, "no")) {
             return "make up your mind then";
@@ -254,12 +263,56 @@ public class GameClient {
         return "just give me your starting position boy <String>";
     }
 
+
     private String leave() throws Exception {
-        server.joinGame(teamColor,gameID, authToken);
+        ws.leave(authToken,gameID);
         return "quit";
     }
 
     private void printPrompt() {
         System.out.print( RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+    }
+
+    @Override
+    public void notifyLoad(LoadGameMessage loadGameMessage) {
+        String message = "game not loaded!!";
+        if (loadGameMessage.getServerMessageType()== ServerMessage.ServerMessageType.LOAD_GAME) {
+            ChessGame newGame = loadGameMessage.getGame();
+            game = newGame;
+            board = game.getBoard();
+            message = "New game loaded.\n";
+            redraw();
+        }
+        System.out.println(SET_TEXT_COLOR_RED + message);
+        System.out.println(help());
+        printPrompt();
+
+    }
+
+    public void notifyError(ErrorMessage errorMessage) {
+        String message = "error not received!";
+        if (errorMessage.getServerMessageType()== ServerMessage.ServerMessageType.ERROR) {
+            message = errorMessage.getErrorMessage();
+        }
+        System.out.println(SET_TEXT_COLOR_RED + message);
+        printPrompt();
+    }
+
+    public void notifyNotification(NotificationMessage notificationMessage) {
+        if (notificationMessage.getServerMessageType()== ServerMessage.ServerMessageType.NOTIFICATION) {
+            String message = notificationMessage.getMessage();
+            System.out.println(SET_TEXT_COLOR_RED + message);
+            printPrompt();
+        }
+
+    }
+
+    private String connectToGame() {
+        try {
+            ws.connect(authToken,gameID);
+            return "Connection to game successful nerd.";
+        } catch (Exception e ) {
+            return e.getMessage();
+        }
     }
 }

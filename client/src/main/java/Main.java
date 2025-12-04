@@ -1,3 +1,5 @@
+import Websocket.NotificationHandler;
+import Websocket.WebsocketFacade;
 import server.ServerFacade;
 import chess.*;
 import model.AuthData;
@@ -26,7 +28,7 @@ public class Main {
             while (authData != null) {
                 joinGameInfo = new LoginClient(server, authData).run();
                 if (joinGameInfo.gameJoined()) {
-                    new GameClient(server,joinGameInfo.color(),board,joinGameInfo.gameID(), authData.authToken()).run();
+                    new GameClient(server,joinGameInfo.color(),board,joinGameInfo.gameID(), authData.authToken(),serverUrl).run();
                 }else {
                     authData = new PreLoginClient(server).run();
                 }

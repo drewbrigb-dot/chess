@@ -14,6 +14,7 @@ import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import model.GameData;
+import model.GameInfo;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -76,7 +77,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ServerMessage badGameID = new ErrorMessage(message);
             connections.broadcastErrorToRoot(session,badGameID);
         }else {
-            var message = String.format("yo %s", authDataAccess.getAuth(authToken).username());
+            String username = authDataAccess.getAuth(authToken).username();
+            GameData gameData = gameDataAccess.getGame(gameID);
+            String teamColor="";
+            if (username == gameData.blackUsername()) {
+                teamColor = "black";
+            }else if (username == gameData.whiteUsername()) {
+                teamColor = "white";
+            }else {
+                teamColor= "observer";
+            }
+            var message = String.format("yo fool this guy wants to fight you: %s, he's playing for this squad: " +
+                    "%s", authDataAccess.getAuth(authToken).username(), teamColor);
             ServerMessage loadGameToRoot = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
             ServerMessage loadGameToAll = new NotificationMessage(message);
             connections.broadcastRootClient(session, loadGameToRoot, gameID);
@@ -94,6 +106,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         Integer gameID = moveCommand.getGameID();
         String authToken = moveCommand.getAuthToken();
+        ChessMove move = moveCommand.getMove();
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
         if (gameDataAccess.getGame(gameID) == null || authDataAccess.getAuth(authToken) == null) {
             String message;
             if (gameDataAccess.getGame(gameID) == null) {
@@ -119,6 +134,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             try {
                 chessGame.makeMove(moveCommand.getMove());
             } catch (InvalidMoveException e) {
+
                 validMove = false;
             }
             if (!validMove) {
@@ -152,15 +168,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
             //end check
-            var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy)", username);
-            ServerMessage loadGameToAll = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
-            ServerMessage loadGameExceptRoot = new NotificationMessage(message);
+            var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy) \n", username);
+            ChessPiece piece = game.getBoard().getPiece(start);
+            message += username + " moved " + piece.getPieceType().toString() + "from " + start.toClientString() +
+                    " to " + end.toClientString();
+            gameDataAccess.updateGame(chessGame,gameID);
+            LoadGameMessage loadGameToAll = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
+            NotificationMessage loadGameExceptRoot = new NotificationMessage(message);
             connections.broadcastToAll(loadGameToAll, gameID);
             connections.broadcastExceptRoot(session, loadGameExceptRoot, gameID);
-            gameDataAccess.updateGame(chessGame,gameID);
 
             ChessGame newGame = gameDataAccess.getGame(gameID).game();
 
+            //check for other color
             if (newGame.isInCheckmate(userColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s dude you're cooked. Checkmate baby.", username);

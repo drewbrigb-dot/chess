@@ -43,6 +43,13 @@ public class ChessPosition {
         return String.format("[%s,%s]", row,col);
     }
 
+    public String toClientString() {
+
+        char colChar = (char) ('A' + (col-1));
+        char rowChar = (char)row;
+        return String.format("%s,%s", rowChar,colChar);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ChessPosition that)) {
