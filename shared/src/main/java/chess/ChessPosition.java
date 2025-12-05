@@ -46,8 +46,8 @@ public class ChessPosition {
     public String toClientString() {
 
         char colChar = (char) ('A' + (col-1));
-        char rowChar = (char)row;
-        return String.format("%s,%s", rowChar,colChar);
+        String rowChar = Integer.toString(row);
+        return String.format("%c,%s", colChar,rowChar);
     }
 
     @Override

@@ -79,13 +79,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }else {
             String username = authDataAccess.getAuth(authToken).username();
             GameData gameData = gameDataAccess.getGame(gameID);
-            String teamColor="";
+            String teamColor="observer";
             if (username == gameData.blackUsername()) {
                 teamColor = "black";
             }else if (username == gameData.whiteUsername()) {
                 teamColor = "white";
-            }else {
-                teamColor= "observer";
             }
             var message = String.format("yo fool this guy wants to fight you: %s, he's playing for this squad: " +
                     "%s", authDataAccess.getAuth(authToken).username(), teamColor);
@@ -147,13 +145,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //check to see if move is with correct team's piece
             String username = authDataAccess.getAuth(authToken).username();
             ChessGame.TeamColor userColor;
+            ChessGame.TeamColor oppColor;
             ChessGame game = gameDataAccess.getGame(gameID).game();
             String blackUsername = gameDataAccess.getGame(gameID).blackUsername();
             String whiteUsername = gameDataAccess.getGame(gameID).whiteUsername();
             if (Objects.equals(blackUsername, username)){
                 userColor = ChessGame.TeamColor.BLACK;
+                oppColor = ChessGame.TeamColor.WHITE;
             }else if (Objects.equals(whiteUsername, username)){
                 userColor = ChessGame.TeamColor.WHITE;
+                oppColor = ChessGame.TeamColor.BLACK;
             }else {
                 String message = String.format("Error! Hands off fella, you just said you wanted to watch buddy.");
                 ServerMessage badGameID = new ErrorMessage(message);
@@ -181,7 +182,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ChessGame newGame = gameDataAccess.getGame(gameID).game();
 
             //check for other color
-            if (newGame.isInCheckmate(userColor)) {
+
+            if (newGame.isInCheckmate(oppColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s dude you're cooked. Checkmate baby.", username);
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);
