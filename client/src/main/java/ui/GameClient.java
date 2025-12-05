@@ -346,7 +346,6 @@ public class GameClient implements NotificationHandler {
         System.out.println(SET_TEXT_COLOR_RED + message);
         System.out.println(help());
         printPrompt();
-
     }
 
     public void notifyError(ErrorMessage errorMessage) {
