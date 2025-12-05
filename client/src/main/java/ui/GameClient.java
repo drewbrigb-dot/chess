@@ -235,6 +235,7 @@ public class GameClient implements NotificationHandler {
 
     public String move (String ... params) throws Exception {
         if (params.length == 2) {
+            ChessPiece.PieceType promoPiece = null;
             String start = params[0];
             String end = params[1];
 
@@ -242,18 +243,23 @@ public class GameClient implements NotificationHandler {
             int rowInt = Character.toLowerCase(row) - 'a' + 1;
             char colStart = start.charAt(1);
             int colInt = Character.getNumericValue(colStart);
-            ChessPosition positionStart = new ChessPosition(colInt,rowInt);
+            ChessPosition positionStart = new ChessPosition(colInt, rowInt);
 
             row = end.charAt(0);
             rowInt = Character.toLowerCase(row) - 'a' + 1;
             char colEnd = end.charAt(1);
             colInt = Character.getNumericValue(colEnd);
-            ChessPosition positionEnd = new ChessPosition(colInt,rowInt);
+            ChessPosition positionEnd = new ChessPosition(colInt, rowInt);
+            if (teamColor == ChessGame.TeamColor.WHITE && colInt == 8) {
+                promoPiece = promptUserForPiece(promoPiece);
+            }
+            if (teamColor == ChessGame.TeamColor.BLACK && colInt == 1) {
+                promoPiece = promptUserForPiece(promoPiece);
+            }
 
-            ChessMove move = new ChessMove(positionStart,positionEnd,null);
-
-            ws.makeMove(authToken,gameID,move);
-            return "Move made successfully weirdo\n";
+            ChessMove move = new ChessMove(positionStart, positionEnd, promoPiece);
+            ws.makeMove(authToken, gameID, move);
+            return "";
         }else {
             return "Please enter two chess locations like 'A2 D4': <String,String>\n";
         }
@@ -285,7 +291,7 @@ public class GameClient implements NotificationHandler {
             ChessPosition position = new ChessPosition(rowInt, colInt);
             ChessGame gameClone = new ChessGame(game);
             Collection<ChessMove> listOfMoves;
-            Collection<ChessMove> reverseList = List.of();
+            Collection<ChessMove> reverseList = new ArrayList<>();
             listOfMoves = gameClone.validMoves(position);
             if (teamColor == ChessGame.TeamColor.BLACK) {
                 for (ChessMove move : listOfMoves) {
@@ -368,5 +374,33 @@ public class GameClient implements NotificationHandler {
         } catch (Exception e ) {
             return e.getMessage();
         }
+    }
+
+    private ChessPiece.PieceType promptUserForPiece (ChessPiece.PieceType promoPiece) {
+        String promo;
+        boolean pieceGiven = false;
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(RESET_TEXT_COLOR + "What piece would you like to promote to?\n" + SET_TEXT_COLOR_GREEN);
+        System.out.print(RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+        while (!pieceGiven) {
+            pieceGiven = true;
+            promo = scanner.nextLine();
+            if (promo.equalsIgnoreCase("queen")) {
+                promoPiece = ChessPiece.PieceType.QUEEN;
+            } else if (promo.equalsIgnoreCase("rook")) {
+                promoPiece = ChessPiece.PieceType.ROOK;
+            } else if (promo.equalsIgnoreCase("bishop")) {
+                promoPiece = ChessPiece.PieceType.BISHOP;
+            } else if (promo.equalsIgnoreCase("knight")) {
+                promoPiece = ChessPiece.PieceType.KNIGHT;
+            } else {
+                pieceGiven = false;
+                System.out.print(RESET_TEXT_COLOR + "That wasn't an option silly." +
+                        "What piece would you like to promote to? <bishop, queen, knight, rook>" +
+                        "\n" + SET_TEXT_COLOR_GREEN);
+                System.out.print(RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+            }
+        }
+        return promoPiece;
     }
 }
