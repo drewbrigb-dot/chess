@@ -108,16 +108,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         if (gameDataAccess.getGame(gameID) == null || authDataAccess.getAuth(authToken) == null) {
-            String message;
-            if (gameDataAccess.getGame(gameID) == null) {
-                message = String.format("Error! you gave me a bad ID %s, what in the world are you doing bro", gameID);
-            } else if (authDataAccess.getAuth(authToken) == null) {
-                message = String.format("Error! You can't do that! what in the world are you doing bro", gameID);
-            } else {
-                message = String.format("Error!", gameID);
-            }
-            ServerMessage badGameID = new ErrorMessage(message);
-            connections.broadcastErrorToRoot(session, badGameID);
+            errorHelperMakeMove(gameID,authToken,session);
         } else {
             ChessGame chessGame = gameDataAccess.getGame(gameID).game();
 
@@ -132,7 +123,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             try {
                 chessGame.makeMove(moveCommand.getMove());
             } catch (InvalidMoveException e) {
-
                 validMove = false;
             }
             if (!validMove) {
@@ -254,5 +244,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var message = String.format("%s left the game because they know they bouta lose.",username);
         ServerMessage loadGameBroadcast = new NotificationMessage(message);
         connections.broadcastToAll(loadGameBroadcast,gameID);
+    }
+
+    private void errorHelperMakeMove (int gameID, String authToken,Session session) throws DataAccessException, IOException {
+        String message;
+        if (gameDataAccess.getGame(gameID) == null) {
+            message = String.format("Error! you gave me a bad ID %s, what in the world are you doing bro", gameID);
+        } else if (authDataAccess.getAuth(authToken) == null) {
+            message = String.format("Error! You can't do that! what in the world are you doing bro", gameID);
+        } else {
+            message = String.format("Error!", gameID);
+        }
+        ServerMessage badGameID = new ErrorMessage(message);
+        connections.broadcastErrorToRoot(session, badGameID);
     }
 }
