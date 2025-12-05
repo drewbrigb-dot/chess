@@ -1,9 +1,8 @@
 package ui;
 
-import Websocket.NotificationHandler;
-import Websocket.WebsocketFacade;
+import websocket.NotificationHandler;
+import websocket.WebsocketFacade;
 import chess.*;
-import model.AuthData;
 import model.GameInfo;
 import server.ServerFacade;
 import websocket.messages.ErrorMessage;
@@ -154,23 +153,9 @@ public class GameClient implements NotificationHandler {
 
 
     private void printWhiteFirst (int i, String stringBoard[][],ChessBoard chessBoard,Collection<ChessMove> listOfMoves) {
-
+        boolean validMove = false;
         for (int j=0;j<8;j++){
-            boolean validMove = false;
-            printHelper(i,j,chessBoard);
-            ChessPosition position = new ChessPosition(i,j);
-            if (listOfMoves != null) {
-                for (ChessMove move : listOfMoves) {
-                    ChessPosition positionCheck = move.getEndPosition();
-                    int newRow =positionCheck.getRow() - 1;
-                    int newCol = positionCheck.getColumn() -1;
-                    ChessPosition corrPosition = new ChessPosition(newRow,newCol);
-                    if (corrPosition.equals(position)) {
-                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
-                        validMove = true;
-                    }
-                }
-            }
+            validMove = printHelperTwo(i,chessBoard,listOfMoves,stringBoard,validMove);
             if (validMove) {continue;}
             if (j%2 == 0) {
                 System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
@@ -182,22 +167,9 @@ public class GameClient implements NotificationHandler {
 
 
     private void printBlackFirst (int i,String stringBoard[][], ChessBoard chessBoard,Collection<ChessMove> listOfMoves) {
+        boolean validMove = false;
         for (int j=0;j<8;j++){
-            boolean validMove = false;
-            printHelper(i,j,chessBoard);
-            ChessPosition position = new ChessPosition(i,j);
-            if (listOfMoves != null) {
-                for (ChessMove move : listOfMoves) {
-                    ChessPosition positionCheck = move.getEndPosition();
-                    int newRow =positionCheck.getRow() - 1;
-                    int newCol = positionCheck.getColumn() -1;
-                    ChessPosition corrPosition = new ChessPosition(newRow,newCol);
-                    if (corrPosition.equals(position)) {
-                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
-                        validMove = true;
-                    }
-                }
-            }
+            validMove = printHelperTwo(i,chessBoard,listOfMoves,stringBoard,validMove);
             if (validMove) {continue;}
             if (j%2 == 0) {
                 System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
@@ -217,6 +189,26 @@ public class GameClient implements NotificationHandler {
                 System.out.print(SET_TEXT_COLOR_RED);
             }
         }
+    }
+
+    private boolean printHelperTwo (int i, ChessBoard chessBoard, Collection<ChessMove> listOfMoves, String[][] stringBoard, boolean validMove) {
+        for (int j = 0; j < 8; j++) {
+            printHelper(i, j, chessBoard);
+            ChessPosition position = new ChessPosition(i, j);
+            if (listOfMoves != null) {
+                for (ChessMove move : listOfMoves) {
+                    ChessPosition positionCheck = move.getEndPosition();
+                    int newRow = positionCheck.getRow() - 1;
+                    int newCol = positionCheck.getColumn() - 1;
+                    ChessPosition corrPosition = new ChessPosition(newRow, newCol);
+                    if (corrPosition.equals(position)) {
+                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
+                        validMove = true;
+                    }
+                }
+            }
+        }
+        return validMove;
     }
 
     public String help() {
