@@ -124,9 +124,9 @@ public class GameClient implements NotificationHandler {
             System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
 
             if (i%2 == 0) {
-                printWhiteFirst(i, board,reverseBoard, listOfMoves);
+                printRow(i, board,reverseBoard, listOfMoves, ChessGame.TeamColor.WHITE);
             }else {
-                printBlackFirst(i, board,reverseBoard, listOfMoves);
+                printRow(i, board,reverseBoard, listOfMoves, ChessGame.TeamColor.BLACK);
             }
 
             System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
@@ -142,9 +142,9 @@ public class GameClient implements NotificationHandler {
             System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
 
             if (i%2 == 0) {
-                printWhiteFirst(i, board,regBoard,listOfMoves);
+                printRow(i, board,regBoard,listOfMoves, ChessGame.TeamColor.WHITE);
             }else {
-                printBlackFirst(i, board,regBoard,listOfMoves);
+                printRow(i, board,regBoard,listOfMoves, ChessGame.TeamColor.BLACK);
             }
 
             System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
@@ -153,8 +153,7 @@ public class GameClient implements NotificationHandler {
     }
 
 
-    private void printWhiteFirst (int i, String stringBoard[][],ChessBoard chessBoard,Collection<ChessMove> listOfMoves) {
-
+    private void printRow (int i, String stringBoard[][], ChessBoard chessBoard, Collection<ChessMove> listOfMoves, ChessGame.TeamColor color) {
         for (int j=0;j<8;j++){
             boolean validMove = false;
             printHelper(i,j,chessBoard);
@@ -162,30 +161,26 @@ public class GameClient implements NotificationHandler {
             validMove = isValidMove(i, stringBoard, listOfMoves, position, j, validMove);
             if (validMove) {continue;}
             if (j%2 == 0) {
-                System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
+                if (color == ChessGame.TeamColor.WHITE) {
+                    System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
+                }else if (color == ChessGame.TeamColor.BLACK){
+                    System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
+                }
             }else {
-                System.out.print(SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
+                if (color == ChessGame.TeamColor.WHITE) {
+                    System.out.print(SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
+                } else if (color == ChessGame.TeamColor.BLACK) {
+                    System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
+                }
             }
         }
     }
 
 
-    private void printBlackFirst (int i,String stringBoard[][], ChessBoard chessBoard,Collection<ChessMove> listOfMoves) {
-        for (int j=0;j<8;j++){
-            boolean validMove = false;
-            printHelper(i,j,chessBoard);
-            ChessPosition position = new ChessPosition(i,j);
-            validMove = isValidMove(i, stringBoard, listOfMoves, position, j, validMove);
-            if (validMove) {continue;}
-            if (j%2 == 0) {
-                System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
-            }else {
-                System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
-            }
-        }
-    }
 
-    private static boolean isValidMove(int i, String[][] stringBoard, Collection<ChessMove> listOfMoves, ChessPosition position, int j, boolean validMove) {
+
+    private static boolean isValidMove(int i, String[][] stringBoard, Collection<ChessMove> listOfMoves, ChessPosition
+            position, int j, boolean validMove) {
         if (listOfMoves != null) {
             for (ChessMove move : listOfMoves) {
                 ChessPosition positionCheck = move.getEndPosition();
@@ -268,9 +263,9 @@ public class GameClient implements NotificationHandler {
             ws.resign(authToken,gameID);
             return "";
         }else if (Objects.equals(line, "no")) {
-            return "make up your mind then";
+            return "make up your mind then\n";
         }else {
-            return "Valid input required dumbo";
+            return "Valid input required dumbo\n";
         }
     }
 
