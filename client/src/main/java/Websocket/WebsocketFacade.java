@@ -1,7 +1,6 @@
 package Websocket;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import org.eclipse.jetty.server.Server;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -12,8 +11,6 @@ import jakarta.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
 
 public class WebsocketFacade extends Endpoint {
 
