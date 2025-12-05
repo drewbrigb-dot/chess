@@ -23,6 +23,11 @@ public class ChessGame {
         gameOver = false;
 
     }
+    public ChessGame(ChessGame otherGame) {
+        this.board = new ChessBoard(otherGame.board);
+        this.turn = otherGame.turn;
+        this.gameOver = otherGame.gameOver;
+    }
 
 
     /**
@@ -71,7 +76,7 @@ public class ChessGame {
         if (piece != null) {
             allmoves = piece.pieceMoves(board, startPosition);
             for (ChessMove move : allmoves) {
-                ChessBoard boardClone = new ChessBoard(board);
+                 ChessBoard boardClone = new ChessBoard(board);
 
                 ChessPiece clonePiece = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
 

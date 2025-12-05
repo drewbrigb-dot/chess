@@ -80,9 +80,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String username = authDataAccess.getAuth(authToken).username();
             GameData gameData = gameDataAccess.getGame(gameID);
             String teamColor="observer";
-            if (username == gameData.blackUsername()) {
+            if (Objects.equals(username, gameData.blackUsername())) {
                 teamColor = "black";
-            }else if (username == gameData.whiteUsername()) {
+            }else if (Objects.equals(username, gameData.whiteUsername())) {
                 teamColor = "white";
             }
             var message = String.format("yo fool this guy wants to fight you: %s, he's playing for this squad: " +
@@ -171,7 +171,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //end check
             var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy) \n", username);
             ChessPiece piece = game.getBoard().getPiece(start);
-            message += username + " moved " + piece.getPieceType().toString() + "from " + start.toClientString() +
+            message += username + " moved " + piece.getPieceType().toString() + " from " + start.toClientString() +
                     " to " + end.toClientString();
             gameDataAccess.updateGame(chessGame,gameID);
             LoadGameMessage loadGameToAll = new LoadGameMessage(gameDataAccess.getGame(gameID).game());
@@ -189,13 +189,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);
                 connections.broadcastToAll(notificationMessage, gameID);
 
-            }else if (newGame.isInStalemate(userColor)) {
+            }else if (newGame.isInStalemate(oppColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s you spent all this time and looked where it got you." +
                         "Absolutely nowhere.'Twas a stalemate.", username);
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);
                 connections.broadcastToAll(notificationMessage, gameID);
-            }else if (newGame.isInCheck(userColor)){
+            }else if (newGame.isInCheck(oppColor)){
                 String checkMessage;
                 checkMessage = String.format("%s you're almost done! Someone's in check!", username);
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);

@@ -22,7 +22,6 @@ public class GameClient implements NotificationHandler {
     ChessGame.TeamColor teamColor;
     public ChessBoard board;
     public ChessBoard reverseBoard;
-    public ChessGame chessGame;
     private final ServerFacade server;
     public int gameID;
     private final WebsocketFacade ws;
@@ -32,7 +31,6 @@ public class GameClient implements NotificationHandler {
                       String authToken,String serverUrl) throws Exception {
         this.server = server;
         teamColor = color;
-        this.board = board;
         this.gameID = gameID;
         this.authToken = authToken;
         ws = new WebsocketFacade(serverUrl, this);
@@ -67,7 +65,7 @@ public class GameClient implements NotificationHandler {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "redraw" -> redraw();
+                case "redraw" -> redraw(null);
                 case "leave" -> leave();
                 case "move" -> move(params);
                 case "resign" -> resign();
@@ -82,18 +80,18 @@ public class GameClient implements NotificationHandler {
             return ex.getMessage();
         }
     }
-    private String redraw() {
+    private String redraw(Collection<ChessMove> listOfMoves) {
         String[][] boardString = boardToString(board);
         reverseBoard = new ChessBoard(board.reverseBoard(board));
         String[][] boardReverseString = boardToString(reverseBoard);
         System.out.println("\n");
         if (teamColor == ChessGame.TeamColor.BLACK) {
-            printBlackBoard(boardReverseString, reverseBoard);
+            printBlackBoard(boardReverseString, reverseBoard,listOfMoves);
             System.out.println("Board reprint successful!\n");
             return"";
 
         } else {
-            printWhiteBoard(boardString, board);
+            printWhiteBoard(boardString, board,listOfMoves);
             return "Board reprint successful!\n";
         }
     }
@@ -118,7 +116,7 @@ public class GameClient implements NotificationHandler {
         return boardString;
     }
 
-    private void printBlackBoard (String[][] board, ChessBoard reverseBoard) {
+    private void printBlackBoard (String[][] board, ChessBoard reverseBoard, Collection<ChessMove> listOfMoves) {
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   h  g  f  e  d  c  b  a    " + RESET_BG_COLOR);
         System.out.print(RESET_TEXT_COLOR +RESET_BG_COLOR);
         for (int i=7; i>=0;i--) {
@@ -126,9 +124,9 @@ public class GameClient implements NotificationHandler {
             System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
 
             if (i%2 == 0) {
-                printWhiteFirst(i, board,reverseBoard);
+                printWhiteFirst(i, board,reverseBoard, listOfMoves);
             }else {
-                printBlackFirst(i, board,reverseBoard);
+                printBlackFirst(i, board,reverseBoard, listOfMoves);
             }
 
             System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
@@ -136,7 +134,7 @@ public class GameClient implements NotificationHandler {
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   h  g  f  e  d  c  b  a    " + RESET_BG_COLOR);
     }
 
-    private void printWhiteBoard (String[][] board, ChessBoard regBoard) {
+    private void printWhiteBoard (String[][] board, ChessBoard regBoard,Collection<ChessMove> listOfMoves) {
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + "   a  b  c  d  e  f  g  h    " + RESET_BG_COLOR);
         System.out.print(RESET_TEXT_COLOR +RESET_BG_COLOR);
         for (int i=7; i>=0;i--) {
@@ -144,9 +142,9 @@ public class GameClient implements NotificationHandler {
             System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + col + " ");
 
             if (i%2 == 0) {
-                printWhiteFirst(i, board,regBoard);
+                printWhiteFirst(i, board,regBoard,listOfMoves);
             }else {
-                printBlackFirst(i, board,regBoard);
+                printBlackFirst(i, board,regBoard,listOfMoves);
             }
 
             System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_MAGENTA + " " + col + " " + RESET_BG_COLOR);
@@ -155,10 +153,25 @@ public class GameClient implements NotificationHandler {
     }
 
 
-    private void printWhiteFirst (int i, String stringBoard[][],ChessBoard chessBoard) {
+    private void printWhiteFirst (int i, String stringBoard[][],ChessBoard chessBoard,Collection<ChessMove> listOfMoves) {
 
         for (int j=0;j<8;j++){
+            boolean validMove = false;
             printHelper(i,j,chessBoard);
+            ChessPosition position = new ChessPosition(i,j);
+            if (listOfMoves != null) {
+                for (ChessMove move : listOfMoves) {
+                    ChessPosition positionCheck = move.getEndPosition();
+                    int newRow =positionCheck.getRow() - 1;
+                    int newCol = positionCheck.getColumn() -1;
+                    ChessPosition corrPosition = new ChessPosition(newRow,newCol);
+                    if (corrPosition.equals(position)) {
+                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
+                        validMove = true;
+                    }
+                }
+            }
+            if (validMove) {continue;}
             if (j%2 == 0) {
                 System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
             }else {
@@ -168,9 +181,24 @@ public class GameClient implements NotificationHandler {
     }
 
 
-    private void printBlackFirst (int i,String stringBoard[][], ChessBoard chessBoard) {
+    private void printBlackFirst (int i,String stringBoard[][], ChessBoard chessBoard,Collection<ChessMove> listOfMoves) {
         for (int j=0;j<8;j++){
+            boolean validMove = false;
             printHelper(i,j,chessBoard);
+            ChessPosition position = new ChessPosition(i,j);
+            if (listOfMoves != null) {
+                for (ChessMove move : listOfMoves) {
+                    ChessPosition positionCheck = move.getEndPosition();
+                    int newRow =positionCheck.getRow() - 1;
+                    int newCol = positionCheck.getColumn() -1;
+                    ChessPosition corrPosition = new ChessPosition(newRow,newCol);
+                    if (corrPosition.equals(position)) {
+                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
+                        validMove = true;
+                    }
+                }
+            }
+            if (validMove) {continue;}
             if (j%2 == 0) {
                 System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
             }else {
@@ -238,7 +266,7 @@ public class GameClient implements NotificationHandler {
         String line = scanner.nextLine();
         if (Objects.equals(line, "yes")){
             ws.resign(authToken,gameID);
-            return "quit";
+            return "";
         }else if (Objects.equals(line, "no")) {
             return "make up your mind then";
         }else {
@@ -250,17 +278,43 @@ public class GameClient implements NotificationHandler {
         if (params.length == 1) {
             String start = params[0];
 
-            char row = start.charAt(0);
-            int rowInt = Character.toLowerCase(row) - 'a' + 1;
-            char col = start.charAt(1);
-            int colInt = Character.getNumericValue(col);
+            char col = start.charAt(0);
+            int colInt = Character.toLowerCase(col) - 'a' + 1;
+            char row = start.charAt(1);
+            int rowInt = Character.getNumericValue(row);
             ChessPosition position = new ChessPosition(rowInt, colInt);
+            ChessGame gameClone = new ChessGame(game);
+            Collection<ChessMove> listOfMoves;
+            Collection<ChessMove> reverseList = List.of();
+            listOfMoves = gameClone.validMoves(position);
+            if (teamColor == ChessGame.TeamColor.BLACK) {
+                for (ChessMove move : listOfMoves) {
+                    ChessPosition posStart = move.getStartPosition();
+                    ChessPosition endPos = move.getEndPosition();
+                    ChessPiece.PieceType piece = move.getPromotionPiece();
+                    int oldRow = posStart.getRow();
+                    int oldCol = posStart.getColumn();
+                    int newRow = 9 - oldRow;
+                    int newCol = 9 - oldCol;
+                    ChessPosition revStart = new ChessPosition(newRow,newCol);
+                    
+                    oldRow = endPos.getRow();
+                    oldCol = endPos.getColumn();
+                    newRow = 9- oldRow;
+                    newCol = 9- oldCol;
+                    ChessPosition revEnd = new ChessPosition(newRow, newCol);
+                    
+                    ChessMove revMove = new ChessMove(revStart,revEnd,piece);
+                    reverseList.add(revMove);
+                }
+                listOfMoves = reverseList;
+            }
+            redraw(listOfMoves);
 
-            Collection<ChessMove> listOfMoves = chessGame.validMoves(position);
 
-            return "highlight successful nerd";
+            return "highlight successful nerd\n";
         }
-        return "just give me your starting position boy <String>";
+        return "just give me your starting position boy <Row Column>\n";
     }
 
 
@@ -281,7 +335,7 @@ public class GameClient implements NotificationHandler {
             game = newGame;
             board = game.getBoard();
             message = "New game loaded.\n";
-            redraw();
+            redraw(null);
         }
         System.out.println(SET_TEXT_COLOR_RED + message);
         System.out.println(help());

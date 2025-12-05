@@ -194,11 +194,11 @@ public class LoginClient {
             if (arrayListID < 1 || arrayListID > listOfGame.size()) {
                 return "No gameIDs of value: " + arrayListID +" Try again bro. \n";
             }
-            //Integer gameID = listOfGame.get(arrayListID);
+            Integer gameID = (listOfGame.get(arrayListID-1).gameID());
 
 
             boolean gameJoined = true;
-            loginClientReturn = new LoginClientReturn(gameJoined,null,null, null);
+            loginClientReturn = new LoginClientReturn(gameJoined,gameID,null, null);
             return "Observing game..." + arrayListID + "\n";
         }
         return "just tell me the game you want to watch, it's not twitch out here: <gameID>\n";
