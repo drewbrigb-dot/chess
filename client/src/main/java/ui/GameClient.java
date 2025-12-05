@@ -159,18 +159,7 @@ public class GameClient implements NotificationHandler {
             boolean validMove = false;
             printHelper(i,j,chessBoard);
             ChessPosition position = new ChessPosition(i,j);
-            if (listOfMoves != null) {
-                for (ChessMove move : listOfMoves) {
-                    ChessPosition positionCheck = move.getEndPosition();
-                    int newRow =positionCheck.getRow() - 1;
-                    int newCol = positionCheck.getColumn() -1;
-                    ChessPosition corrPosition = new ChessPosition(newRow,newCol);
-                    if (corrPosition.equals(position)) {
-                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
-                        validMove = true;
-                    }
-                }
-            }
+            validMove = isValidMove(i, stringBoard, listOfMoves, position, j, validMove);
             if (validMove) {continue;}
             if (j%2 == 0) {
                 System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
@@ -186,18 +175,7 @@ public class GameClient implements NotificationHandler {
             boolean validMove = false;
             printHelper(i,j,chessBoard);
             ChessPosition position = new ChessPosition(i,j);
-            if (listOfMoves != null) {
-                for (ChessMove move : listOfMoves) {
-                    ChessPosition positionCheck = move.getEndPosition();
-                    int newRow =positionCheck.getRow() - 1;
-                    int newCol = positionCheck.getColumn() -1;
-                    ChessPosition corrPosition = new ChessPosition(newRow,newCol);
-                    if (corrPosition.equals(position)) {
-                        System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
-                        validMove = true;
-                    }
-                }
-            }
+            validMove = isValidMove(i, stringBoard, listOfMoves, position, j, validMove);
             if (validMove) {continue;}
             if (j%2 == 0) {
                 System.out.print( SET_BG_COLOR_WHITE + " " + stringBoard[i][j].charAt(0) + " ");
@@ -205,6 +183,22 @@ public class GameClient implements NotificationHandler {
                 System.out.print(SET_BG_COLOR_BLACK + " " + stringBoard[i][j].charAt(0) + " ");
             }
         }
+    }
+
+    private static boolean isValidMove(int i, String[][] stringBoard, Collection<ChessMove> listOfMoves, ChessPosition position, int j, boolean validMove) {
+        if (listOfMoves != null) {
+            for (ChessMove move : listOfMoves) {
+                ChessPosition positionCheck = move.getEndPosition();
+                int newRow =positionCheck.getRow() - 1;
+                int newCol = positionCheck.getColumn() -1;
+                ChessPosition corrPosition = new ChessPosition(newRow,newCol);
+                if (corrPosition.equals(position)) {
+                    System.out.print(SET_BG_COLOR_YELLOW + " " + stringBoard[i][j].charAt(0) + " ");
+                    validMove = true;
+                }
+            }
+        }
+        return validMove;
     }
 
     private void printHelper(int i,int j, ChessBoard chessBoard) {
