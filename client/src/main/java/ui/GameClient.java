@@ -1,7 +1,7 @@
 package ui;
 
-import Websocket.NotificationHandler;
-import Websocket.WebsocketFacade;
+import websocket.NotificationHandler;
+import websocket.WebsocketFacade;
 import chess.*;
 import model.AuthData;
 import model.GameInfo;
