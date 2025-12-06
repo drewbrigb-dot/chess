@@ -155,7 +155,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcastErrorToRoot(session, badGameID);
                 return;
             }
-            //end check
             var message = String.format("%s made a move, yeah he made a moooove (Steve Lacy) \n", username);
             ChessPiece piece = game.getBoard().getPiece(start);
             message += username + " moved " + piece.getPieceType().toString() + " from " + start.toClientString() +
