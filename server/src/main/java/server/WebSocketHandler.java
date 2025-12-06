@@ -170,22 +170,45 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcastExceptRoot(session, loadGameExceptRoot, gameID);
 
             ChessGame newGame = gameDataAccess.getGame(gameID).game();
+            ChessBoard boardOpp = new ChessBoard(newGame.getBoard());
+            ChessBoard boardUser = new ChessBoard(newGame.getBoard());
+            ChessGame gameCopyOpp = new ChessGame();
+            ChessGame gameCopyUser = new ChessGame();
+            gameCopyOpp.setBoard(boardOpp);
+            gameCopyUser.setBoard(boardUser);
+
 
             //check for other color
 
-            if (newGame.isInCheckmate(oppColor)) {
+            if (gameCopyOpp.isInCheckmate(oppColor) || gameCopyUser.isInCheckmate(userColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s dude you're cooked. Checkmate baby.", username);
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);
                 connections.broadcastToAll(notificationMessage, gameID);
-
-            }else if (newGame.isInStalemate(oppColor)) {
+                return;
+            }
+            boardOpp = new ChessBoard(newGame.getBoard());
+            boardUser = new ChessBoard(newGame.getBoard());
+            gameCopyOpp = new ChessGame();
+            gameCopyUser = new ChessGame();
+            gameCopyOpp.setBoard(boardOpp);
+            gameCopyUser.setBoard(boardUser);
+            if (gameCopyOpp.isInStalemate(oppColor) || gameCopyUser.isInStalemate(userColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s you spent all this time and looked where it got you." +
                         "Absolutely nowhere.'Twas a stalemate.", username);
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);
                 connections.broadcastToAll(notificationMessage, gameID);
-            }else if (newGame.isInCheck(oppColor)){
+                return;
+            }
+            boardOpp = new ChessBoard(newGame.getBoard());
+            boardUser = new ChessBoard(newGame.getBoard());
+            gameCopyOpp = new ChessGame();
+            gameCopyUser = new ChessGame();
+            gameCopyOpp.setBoard(boardOpp);
+            gameCopyUser.setBoard(boardUser);
+
+            if (gameCopyOpp.isInCheck(oppColor) || gameCopyUser.isInCheck(userColor)){
                 String checkMessage;
                 checkMessage = String.format("%s you're almost done! Someone's in check!", username);
                 ServerMessage notificationMessage = new NotificationMessage(checkMessage);

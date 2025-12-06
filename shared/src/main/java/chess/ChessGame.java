@@ -195,13 +195,16 @@ public class ChessGame {
                     continue;
                 }
                 Collection<ChessMove> pieceMoves = validMoves(position);
-                for (ChessMove move : pieceMoves) {
+                if (!pieceMoves.isEmpty()) {
+                    return false;
+                }
+                /*for (ChessMove move : pieceMoves) {
                     ChessBoard boardClone = new ChessBoard(board);
                     if (!tryHelper(move,teamColor)){
                         return false;
                     };
                     board = boardClone;
-                }
+                }*/
             }
         }
         return true;

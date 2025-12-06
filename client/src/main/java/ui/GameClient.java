@@ -228,30 +228,39 @@ public class GameClient implements NotificationHandler {
             String start = params[0];
             String end = params[1];
 
-            char row = start.charAt(0);
-            int rowInt = Character.toLowerCase(row) - 'a' + 1;
-            char colStart = start.charAt(1);
-            int colInt = Character.getNumericValue(colStart);
-            ChessPosition positionStart = new ChessPosition(colInt, rowInt);
+            char rowLetter = start.charAt(0);
+            char rowNum = start.charAt(1);
+            char colLetter = end.charAt(0);
+            char colNum = end.charAt(1);
+            if (Character.isLetter(rowLetter) && Character.isLetter(colLetter) && Character.isDigit(rowNum)
+                    && Character.isDigit(colNum)) {
+                char row = start.charAt(0);
+                int rowInt = Character.toLowerCase(row) - 'a' + 1;
+                char colStart = start.charAt(1);
+                int colInt = Character.getNumericValue(colStart);
+                ChessPosition positionStart = new ChessPosition(colInt, rowInt);
 
-            row = end.charAt(0);
-            rowInt = Character.toLowerCase(row) - 'a' + 1;
-            char colEnd = end.charAt(1);
-            colInt = Character.getNumericValue(colEnd);
-            ChessPosition positionEnd = new ChessPosition(colInt, rowInt);
-            if (teamColor == ChessGame.TeamColor.WHITE && colInt == 8) {
-                promoPiece = promptUserForPiece(promoPiece);
-            }
-            if (teamColor == ChessGame.TeamColor.BLACK && colInt == 1) {
-                promoPiece = promptUserForPiece(promoPiece);
-            }
+                row = end.charAt(0);
+                rowInt = Character.toLowerCase(row) - 'a' + 1;
+                char colEnd = end.charAt(1);
+                colInt = Character.getNumericValue(colEnd);
+                ChessPosition positionEnd = new ChessPosition(colInt, rowInt);
+                if (teamColor == ChessGame.TeamColor.WHITE && colInt == 8) {
+                    promoPiece = promptUserForPiece(promoPiece);
+                }
+                if (teamColor == ChessGame.TeamColor.BLACK && colInt == 1) {
+                    promoPiece = promptUserForPiece(promoPiece);
+                }
 
-            ChessMove move = new ChessMove(positionStart, positionEnd, promoPiece);
-            ws.makeMove(authToken, gameID, move);
-            return "";
+                ChessMove move = new ChessMove(positionStart, positionEnd, promoPiece);
+                ws.makeMove(authToken, gameID, move);
+                return "";
+            }
         }else {
             return "Please enter two chess locations like 'A2 D4': <String,String>\n";
         }
+        return "That was some bad input there buddy. You might wanna switch those letters around or somethin'. " +
+                "Maybe try somehting like this alright buddy? 'A2 D4': <String,String>\n";
     }
 
     private String resign () throws Exception {
