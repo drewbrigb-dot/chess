@@ -198,13 +198,6 @@ public class ChessGame {
                 if (!pieceMoves.isEmpty()) {
                     return false;
                 }
-                /*for (ChessMove move : pieceMoves) {
-                    ChessBoard boardClone = new ChessBoard(board);
-                    if (!tryHelper(move,teamColor)){
-                        return false;
-                    };
-                    board = boardClone;
-                }*/
             }
         }
         return true;

@@ -111,14 +111,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             errorHelperMakeMove(gameID,authToken,session);
         } else {
             ChessGame chessGame = gameDataAccess.getGame(gameID).game();
-
             if(chessGame.getGameOver()) {
                 var message = String.format("Error! Game is over jitt, why you tryna change the past?");
                 ServerMessage badGameID = new ErrorMessage(message);
                 connections.broadcastErrorToRoot(session, badGameID);
                 return;
             }
-
             boolean validMove = true;
             try {
                 chessGame.makeMove(moveCommand.getMove());
@@ -131,7 +129,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcastErrorToRoot(session, badGameID);
                 return;
             }
-
             //check to see if move is with correct team's piece
             String username = authDataAccess.getAuth(authToken).username();
             ChessGame.TeamColor userColor;
@@ -168,7 +165,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             NotificationMessage loadGameExceptRoot = new NotificationMessage(message);
             connections.broadcastToAll(loadGameToAll, gameID);
             connections.broadcastExceptRoot(session, loadGameExceptRoot, gameID);
-
             ChessGame newGame = gameDataAccess.getGame(gameID).game();
             ChessBoard boardOpp = new ChessBoard(newGame.getBoard());
             ChessBoard boardUser = new ChessBoard(newGame.getBoard());
@@ -176,10 +172,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ChessGame gameCopyUser = new ChessGame();
             gameCopyOpp.setBoard(boardOpp);
             gameCopyUser.setBoard(boardUser);
-
-
             //check for other color
-
             if (gameCopyOpp.isInCheckmate(oppColor) || gameCopyUser.isInCheckmate(userColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s dude you're cooked. Checkmate baby.", username);
@@ -187,12 +180,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcastToAll(notificationMessage, gameID);
                 return;
             }
-            boardOpp = new ChessBoard(newGame.getBoard());
-            boardUser = new ChessBoard(newGame.getBoard());
-            gameCopyOpp = new ChessGame();
-            gameCopyUser = new ChessGame();
-            gameCopyOpp.setBoard(boardOpp);
-            gameCopyUser.setBoard(boardUser);
             if (gameCopyOpp.isInStalemate(oppColor) || gameCopyUser.isInStalemate(userColor)) {
                 String checkMessage;
                 checkMessage = String.format("%s you spent all this time and looked where it got you." +
@@ -201,13 +188,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcastToAll(notificationMessage, gameID);
                 return;
             }
-            boardOpp = new ChessBoard(newGame.getBoard());
-            boardUser = new ChessBoard(newGame.getBoard());
-            gameCopyOpp = new ChessGame();
-            gameCopyUser = new ChessGame();
-            gameCopyOpp.setBoard(boardOpp);
-            gameCopyUser.setBoard(boardUser);
-
             if (gameCopyOpp.isInCheck(oppColor) || gameCopyUser.isInCheck(userColor)){
                 String checkMessage;
                 checkMessage = String.format("%s you're almost done! Someone's in check!", username);
